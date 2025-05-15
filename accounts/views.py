@@ -35,3 +35,20 @@ def logout_view(request):
 
 def home_view(request):
     return render(request, 'accounts/home.html')
+
+def chat_view(request):
+    user_input = None
+    bot_response = None
+
+    if request.method == "POST":
+        user_input = request.POST.get("user_input")
+
+        if "청금석" in user_input:
+            bot_response = "청금석은 인챈트 필수 재료입니다."
+        else:
+            bot_response = "죄송해요, 아직 학습되지 않은 질문이에요!"
+
+    return render(request, "accounts/chat.html", {
+        "user_input": user_input,
+        "bot_response": bot_response
+    })
