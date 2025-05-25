@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>마인크래프트 물약 조합 시뮬레이터 (텍스트)</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Minecraft', Arial, sans-serif;
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            grid-template-rows: auto 1fr;
+            grid-template-areas:
+                "header header header"
+                "left-col middle-col right-col";
+            gap: 15px;
+            padding: 15px;
+            max-width: 1300px;
+            margin: auto;
+            background-color: #c6c6c6;
+            color: #333;
+        }
+
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('{% static "fonts/MinecraftRegular-Bmg3.otf" %}') format('opentype'); /* 실제 폰트 경로 - 없으면 주석처리 */
+        }
+
+        .header-area {
+            grid-area: header;
+            text-align: center;
+            padding: 10px;
+            background-color: #585858;
+            color: white;
+            border: 2px solid #363636;
+            box-shadow: inset 0 0 0 2px #a0a0a0, 0 5px 0 #363636;
+            margin-bottom: 10px;
+        }
+        .header-area h1 { margin: 0; font-size: 24px; }
+
+        .column {
+            border: 2px solid #363636;
+            padding: 15px;
+            border-radius: 0px;
+            background-color: #8b8b8b;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 0 2px #a0a0a0;
+        }
+        .left-column { grid-area: left-col; }
+        .middle-column { grid-area: middle-col; }
+        .right-column { grid-area: right-col; }
+
+        .section-title {
+            background-color: #585858;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border: 2px solid #363636;
+            box-shadow: inset 0 0 0 2px #a0a0a0;
+            font-size: 18px;
+        }
+
+        .ingredients-section { margin-bottom: 20px; }
+        .potion-list-section {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 250px);
+            padding-right: 5px;
+            background-color: #c6c6c6;
+            border: 2px solid #585858;
+            box-shadow: inset 2px 2px 3px rgba(0,0,0,0.5);
+        }
+
+        .item-button, .potion-list-item button {
+            background-color: #c6c6c6;
+            color: #202020;
+            border: 2px solid #363636;
+            padding: 8px 10px;
+            text-align: left; /* 텍스트만 있을 경우 왼쪽 정렬이 보기 좋음 */
+            text-decoration: none;
+            display: block; /* flex 대신 block으로 변경 */
+            font-size: 14px;
+            margin: 2px 0;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 0 2px #ffffff, 0 3px 0 #585858;
+            font-family: inherit;
+        }
+        .item-button:hover, .potion-list-item button:hover {
+            background-color: #bababa;
+        }
+        .item-button:active, .potion-list-item button:active {
+            box-shadow: inset 0 0 0 2px #ffffff, 0 1px 0 #585858;
+            transform: translateY(2px);
+        }
+        .item-button.reset { background-color: #e07171; color: white; }
+        .item-button.reset:hover { background-color: #d16161; }
+
+        .potion-list-item { margin-bottom: 3px; }
+        .potion-list-item button.selected {
+            background-color: #a0d0a0;
+            border-color: #508050;
+            box-shadow: inset 0 0 0 2px #c0f0c0, 0 3px 0 #508050;
+        }
+
+        .brewing-area {
+            text-align: center;
+            background-color: #c6c6c6;
+            padding: 20px;
+            border: 2px solid #585858;
+            box-shadow: inset 2px 2px 3px rgba(0,0,0,0.5);
+            margin-bottom:15px;
+        }
+        /* .brewing-area img 관련 스타일 제거 */
+        .brewing-area h3 { color: #202020; font-size: 1.2em; margin-top: 10px; } /* 이미지 없을 때 h3가 위로 붙도록 */
+        .brewing-area p { font-size: 0.9em; color: #404040; }
+
+        .log-area, .recipe-display-area {
+             background-color: #c6c6c6;
+             border: 2px solid #585858;
+             padding: 10px;
+             box-shadow: inset 2px 2px 3px rgba(0,0,0,0.5);
+        }
+        .log-area ul, .recipe-display-area div {
+            list-style-type: none;
+            padding: 0;
+        }
+        .log-area .log-item, .recipe-display-area .recipe-step {
+            background-color: #8b8b8b;
+            border: 2px solid #585858;
+            color: #202020;
+            padding: 8px;
+            margin-bottom: 5px;
+            /* display: flex; align-items: center; 제거 */
+        }
+        .recipe-display-area .recipe-step strong { min-width: 60px; display: inline-block;}
+        /* .item-info img 관련 스타일 제거 */
+        .log-area strong, .recipe-display-area strong { }
+
+        .message-area {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 0px;
+            text-align: center;
+            border: 2px solid #363636;
+            box-shadow: inset 0 0 0 2px #a0a0a0;
+            color: white;
+            font-weight: bold;
+        }
+        .message-area.info { background-color: #6b996b; }
+        .message-area.error { background-color: #c47171; }
+
+        .potion-list-section::-webkit-scrollbar { width: 10px; }
+        .potion-list-section::-webkit-scrollbar-track { background: #585858; border-left: 2px solid #363636; }
+        .potion-list-section::-webkit-scrollbar-thumb { background: #c6c6c6; border: 2px solid #363636; }
+        .potion-list-section::-webkit-scrollbar-thumb:hover { background: #bababa; }
+    </style>
+</head>
+<body>
+    <div class="header-area">
+        <h1>마인크래프트 물약 시뮬레이터 (텍스트)</h1>
+    </div>
+
+    <!-- 왼쪽: 재료 및 모든 물약 목록 -->
+    <div class="column left-column">
+        <div class="ingredients-section">
+            <h2 class="section-title">재료 선택</h2>
+            {% for id, data in all_ingredients.items %}
+                <form method="post" style="display: inline-block; width: calc(50% - 4px); margin-right: 2px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_ingredient">
+                    <input type="hidden" name="item_id" value="{{ id }}">
+                    <button type="submit" class="item-button" title="{{ data.description }}">
+                        {{ data.name }}
+                    </button>
+                </form>
+            {% endfor %}
+        </div>
+
+        <h2 class="section-title">물약 목록</h2>
+        <div class="potion-list-section">
+            {% for id, data in all_potions_for_list.items %}
+                <div class="potion-list-item">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="select_potion_from_list">
+                        <input type="hidden" name="item_id" value="{{ id }}">
+                        <button type="submit" class="{% if current_potion_id == id %}selected{% endif %}" title="{{ data.description }}">
+                            {{ data.name }}
+                        </button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 가운데: 진행 중인 물약 및 재료 로그 -->
+    <div class="column middle-column">
+        <div class="brewing-area">
+            <h2 class="section-title">현재 물약</h2>
+            {# 현재 물약 이미지 표시 부분 제거 #}
+            <h3>{{ current_potion_name }}</h3>
+            <p>{{ current_potion_description }}</p>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reset_brewing">
+                <button type="submit" class="item-button reset">조합 초기화</button>
+            </form>
+        </div>
+
+        <div class="log-area">
+            <h2 class="section-title">적용된 재료</h2>
+            {% if applied_ingredients_log %}
+                <ul>
+                    {% for log_entry in applied_ingredients_log %}
+                        <li class="log-item">
+                            {# 재료 로그 이미지 표시 부분 제거 #}
+                            <strong>{{ log_entry.name }}</strong>: <span>{{ log_entry.description }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="text-align: center; color: #d0d0d0;">적용된 재료가 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 오른쪽: 메시지 및 선택된 물약의 조합법 -->
+    <div class="column right-column">
+        {% if message %}
+            <div class="message-area {% if '잘못된' in message or '없습니다' in message or '오류' in message %}error{% else %}info{% endif %}">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <div class="recipe-display-area">
+            <h2 class="section-title">조합법</h2>
+            {% if recipe_to_display %}
+                <div>
+                    <div class="recipe-step item-info">
+                        <strong>베이스:</strong>
+                        {# 베이스 이미지 표시 부분 제거 #}
+                        <span>{{ recipe_to_display.base.name }}</span>
+                    </div>
+                    <div style="text-align: center; font-size: 20px; margin: 5px 0;">+</div>
+                    <div class="recipe-step item-info">
+                        <strong>재료:</strong>
+                        {# 재료 이미지 표시 부분 제거 #}
+                        <span>{{ recipe_to_display.ingredient.name }}</span>
+                    </div>
+                    <div style="text-align: center; font-size: 20px; margin: 5px 0;">=</div>
+                    <div class="recipe-step item-info">
+                        <strong>결과:</strong>
+                        {# 결과 이미지 표시 부분 제거 #}
+                        <span>{{ recipe_to_display.result.name }}</span>
+                    </div>
+                </div>
+            {% elif current_potion_id == 'water_bottle' %}
+                <p style="text-align: center; color: #d0d0d0;">물병은 조합의 시작입니다.</p>
+            {% elif not recipe_to_display and current_potion_id and current_potion_id != 'water_bottle' %}
+                 <p style="text-align: center; color: #d0d0d0;">'{{ current_potion_name }}'은(는) 직접 조합으로 만들 수 없거나, 최상위 물약일 수 있습니다.</p>
+            {% else %}
+                <p style="text-align: center; color: #d0d0d0;">물약을 선택하거나 재료를 조합하면 여기에 조합법이 표시됩니다.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
