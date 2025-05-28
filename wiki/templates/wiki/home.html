@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>위키 대문</title>
+</head>
+<body>
+  <h1>📘 스티븐 위키 대문</h1>
+  <ul>
+    {% for page in pages %}
+      <li><a href="{% url 'wiki:view' page.title %}">{{ page.title }}</a></li>
+    {% endfor %}
+  </ul>
+  <a href="/wiki/새문서/edit/">➕ 새 문서 만들기</a>
+</body>
+</html>

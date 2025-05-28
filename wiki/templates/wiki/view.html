@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ page.title }}</title>
+</head>
+<body>
+  <h2>{{ page.title }}</h2>
+  <div>
+    {{ page.content|safe }}
+  </div>
+  <a href="{% url 'wiki:edit' page.title %}">✏️ 편집</a>
+</body>
+</html>

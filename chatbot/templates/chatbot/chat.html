@@ -15,6 +15,12 @@
     {% if user_input %}
         <p><strong>사용자:</strong> {{ user_input }}</p>
         <p><strong>챗봇:</strong> {{ bot_response }}</p>
+    {% else %}
+        <p style="color: gray;">아래 입력창에 질문을 입력해 주세요 :)</p>
+    {% endif %}
+
+    {% if uuid_info %}
+        <p><strong>UUID 정보:</strong> {{ uuid_info }}</p>
     {% endif %}
 </body>
 </html>
