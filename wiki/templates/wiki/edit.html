@@ -1,48 +1,28 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ title }} 편집</title>
-  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
-  <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      margin: 20px;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    #editor {
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-<body>
-  <h2>{{ title }} 편집</h2>
-  <form method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="content" id="content-input">
-    
-    <label for="summary">편집 요약:</label>
-    <input type="text" name="summary" id="summary" style="width:100%;" placeholder="예: 오타 수정, 문단 추가 등"><br><br>
-
-    <div id="editor"></div>
-    <br>
-    <button type="submit">💾 저장</button>
-    <a href="/wiki/{{ title }}/">취소</a>
-  </form>
-  <script>
-    const editor = new toastui.Editor({
-      el: document.querySelector('#editor'),
-      height: '500px',
-      initialEditType: 'markdown',
-      previewStyle: 'vertical',
-      initialValue: `{{ content|escapejs }}`,
-    });
-    document.querySelector('form').addEventListener('submit', function () {
-      document.querySelector('#content-input').value = editor.getMarkdown();
-    });
-  </script>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}{{ title }} 편집 - 스티븐 위키{% endblock %}
+{% block content %}
+<h2>{{ title }} 편집</h2>
+<form method="POST">
+  {% csrf_token %}
+  <input type="hidden" name="content" id="content-input">
+  <label for="summary">편집 요약:</label>
+  <input type="text" name="summary" style="width:100%;" placeholder="예: 오타 수정, 문단 추가 등"><br><br>
+  <div id="editor"></div><br>
+  <button type="submit">💾 저장</button>
+  <a href="/wiki/{{ title }}/">취소</a>
+</form>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+<script>
+  const editor = new toastui.Editor({
+    el: document.querySelector('#editor'),
+    height: '500px',
+    initialEditType: 'markdown',
+    previewStyle: 'vertical',
+    initialValue: `{{ content|escapejs }}`
+  });
+  document.querySelector('form').addEventListener('submit', function () {
+    document.querySelector('#content-input').value = editor.getMarkdown();
+  });
+</script>
+{% endblock %}

@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
+{% extends "base.html" %}
+{% block title %}{{ page.title }} - 스티븐 위키{% endblock %}
+{% block content %}
   <title>{{ page.title }}</title>
 </head>
 <body>
@@ -10,5 +9,4 @@
     {{ page.content|safe }}
   </div>
   <a href="{% url 'wiki:edit' page.title %}">✏️ 편집</a>
-</body>
-</html>
+{% endblock %}

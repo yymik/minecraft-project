@@ -168,8 +168,17 @@
   <!-- 중앙 대문 -->
   <div class="left-panel">
     <div class="wiki-intro">
-      <h5>“여러분이 함께 가꾸어 나가는 정보”</h5>
-      <p>스티븐 위키에 오신 것을 환영합니다!<br>스티븐 위키는 누구나 기억할 수 있는 위키입니다.</p>
+      {% if main_doc %}
+        <h5>
+          <a href="/wiki/{{ main_doc.title }}/" style="text-decoration: none; color: #006699; font-weight: bold;">
+            {{ main_doc.title }}
+          </a>
+        </h5>
+        <p>{{ main_doc.content|linebreaksbr }}</p>
+      {% else %}
+        <h5>대문 문서를 찾을 수 없습니다</h5>
+        <p>위키 메인 문서가 아직 작성되지 않았습니다.</p>
+      {% endif %}
     </div>
 
     <div class="black-box">
@@ -260,9 +269,5 @@
     overlay.style.display = overlay.style.display === 'none' ? 'block' : 'none';
   }
 </script>
-<ul>
-    <li><a href="/wiki/튜토리얼">📄 튜토리얼 보기</a></li>
-    <li><a href="/wiki/튜토리얼/edit">✏️ 튜토리얼 편집</a></li>
-  </ul>
 </body>
 </html>

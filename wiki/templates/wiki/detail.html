@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ title }}</title>
-</head>
-<body>
-  <h1>{{ title }}</h1>
-  <hr>
-  <div>
-    {{ content|linebreaksbr }}
-  </div>
-
-  <p><a href="{% url 'wiki:wiki_edit' title %}">문서 편집</a></p>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}{{ title }} 편집 - 스티븐 위키{% endblock %}
+{% block content %}
+<h2>{{ title }}</h2>
+<hr>
+<div>{{ content|linebreaksbr }}</div>
+<p><a href="{% url 'wiki:wiki_edit' title %}">[편집]</a></p>
+{% endblock %}
