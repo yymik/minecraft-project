@@ -11,4 +11,9 @@ urlpatterns = [
     path('potions/', include('potions.urls')),
     path('enchant-recommender/', include('enchant_recommender.urls')),
     path('wiki/', include(('wiki.urls', 'wiki'), namespace='wiki')),  # 개별 문서/편집용
+<<<<<<< HEAD
+=======
+    path('skin-editor/', include('skin_editor.urls')),
+    path('save-analyzer/', include('save_analyzer.urls')), 
+>>>>>>> 1756a89 (0608 15:51 json 스킨편집기)
 ]
