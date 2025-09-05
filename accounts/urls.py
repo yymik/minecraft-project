@@ -1,27 +1,16 @@
-<<<<<<< HEAD
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('', views.home_view, name='home'),
-    path('login/', views.login_view, name='login'),
-    path('register/', views.register_view, name='register'),
-    path('logout/', views.logout_view, name='logout'),
-]
-=======
 # accounts/urls.py
-
 from django.urls import path
 from . import views
 
-app_name = 'accounts'
+app_name = "accounts"
 
 urlpatterns = [
-    # 로그인 URL -> views.py의 login_view 함수를 찾음
-    path('login/', views.login_view, name='login'),
-    path('register/', views.register_view, name='register'),
-    path('logout/', views.logout_view, name='logout'),
-    path('send-otp/', views.send_otp_view, name='send_otp'),
-    
+    path("register/", views.register_view, name="register"),
+    path("verify/", views.verify_email_view, name="verify"),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
+    path("forgot/", views.forgot_password_view, name="forgot"),
+    path("reset/<uidb64>/<token>/", views.reset_password_view, name="reset_password"),
+    path("send-otp/", views.send_otp_view, name="send_otp"),
+    path("verify-otp/", views.verify_otp_view, name="verify_otp"),
 ]
->>>>>>> 1756a89 (0608 15:51 json 스킨편집기)

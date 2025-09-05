@@ -22,6 +22,3 @@ wiki.insert_one({
         }
     ]
 })
-
-print("✅ 대문 문서 삽입 완료")
-

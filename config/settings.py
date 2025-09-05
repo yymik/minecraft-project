@@ -24,11 +24,8 @@ INSTALLED_APPS = [
     'enchant_recommender',
     'wiki',
     'django_extensions',
-<<<<<<< HEAD
-=======
     'skin_editor',
     'save_analyzer',
->>>>>>> 1756a89 (0608 15:51 json 스킨편집기)
 ]
 
 # 미들웨어 설정
@@ -96,8 +93,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SECURE = False
 X_FRAME_OPTIONS = 'SAMEORIGIN'
-<<<<<<< HEAD
-=======
 
 # --- 이메일 설정 ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -107,4 +102,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'minanyang10@gmail.com'      # 🚨 실제 본인의 Gmail 주소로 변경
 EMAIL_HOST_PASSWORD = 'hffl kpkf nfh rcisc'     # 🚨 실제 본인의 Gmail 앱 비밀번호로 변경
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
->>>>>>> 1756a89 (0608 15:51 json 스킨편집기)
+
+SITE_URL = "http://localhost:8000"  # 배포 시 실제 도메인으로

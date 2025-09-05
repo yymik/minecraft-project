@@ -42,10 +42,17 @@
     </style>
 </head>
 <body>
-
 <div class="form-container">
     <h2><a href="home.html" style="text-decoration: none; color: inherit;">스티븐 위키 로그인</a></h2>
-    
+    {% if messages %}
+        {% for m in messages %}
+            <div class="alert alert-{{ m.tags }} alert-dismissible fade show" role="alert">
+            {{ m }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <form>
         <!-- 아이디(사용자 이름) -->
         <div class="mb-3">
@@ -67,14 +74,14 @@
                     로그인 상태 유지
                 </label>
             </div>
-            <a href="/find-password">비밀번호 찾기</a>
+            <a href="{% url 'accounts:forgot' %}">비밀번호 찾기</a>
         </div>
         
         <button type="submit" class="btn btn-primary mt-3">로그인</button>
     </form>
     
     <div class="text-center mt-3">
-        <p>계정이 없으신가요? <a href="signup.html">회원가입</a></p>
+        <p>계정이 없으신가요? <a href="{% url 'accounts:register' %}">회원가입</a></p>
     </div>
 </div>
 
