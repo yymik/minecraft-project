@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>챗봇</title>
+</head>
+<body>
+    <h2>챗봇에게 질문하세요</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="user_input" placeholder="질문을 입력하세요" required>
+        <button type="submit">보내기</button>
+    </form>
+
+    {% if user_input %}
+        <p><strong>사용자:</strong> {{ user_input }}</p>
+        <p><strong>챗봇:</strong> {{ bot_response }}</p>
+    {% else %}
+        <p style="color: gray;">아래 입력창에 질문을 입력해 주세요 :)</p>
+    {% endif %}
+
+    {% if uuid_info %}
+        <p><strong>UUID 정보:</strong> {{ uuid_info }}</p>
+    {% endif %}
+</body>
+</html>

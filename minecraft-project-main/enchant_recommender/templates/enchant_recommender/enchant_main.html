@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>인챈트 메인</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f3f3f3; }
+    .main-box { display: flex; margin-top: 20px; gap: 20px; }
+    .left-panel { flex: 1; background: #eee; padding: 15px; border: 2px solid #ccc; }
+    .center-panel { flex: 2; background: #fff; padding: 15px; border: 2px solid #bbb; }
+    .right-panel { flex: 1; background: #e5e5e5; padding: 15px; border: 2px solid #bbb; }
+    .post { border-bottom: 1px solid #ddd; margin-bottom: 10px; padding-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container main-box">
+    <!-- 왼쪽 메뉴 -->
+    <div class="left-panel">
+      <h5>메뉴</h5>
+      <a href="/" class="btn btn-secondary btn-sm w-100 mb-2">메인으로</a>
+      <a href="{% url 'enchant_recommender:main' %}" class="btn btn-secondary btn-sm w-100 mb-2">인챈트</a>
+      <a href="/potions/simulator/" class="btn btn-secondary btn-sm w-100 mb-2">양조</a>
+      <a href="/wiki/challenge-info/" class="btn btn-secondary btn-sm w-100 mb-2">도전과제</a>
+    </div>
+
+    <!-- 중앙 게시물 -->
+    <!-- 중앙 게시물 -->
+<div class="center-panel">
+  <h4>📜 인챈트 게시물</h4>
+
+  {% if posts %}
+    {% for post in posts %}
+      <div class="post d-flex justify-content-between align-items-center">
+        <!-- 제목 클릭 시 recommender 화면으로 이동, post_id 전달 -->
+        <a href="{% url 'enchant_recommender:recommender' %}?post_id={{ post.id }}" class="post-title">
+          {{ post.title }}
+        </a>
+
+        <!-- 좋아요 버튼 -->
+        <form method="post" action="{% url 'enchant_recommender:like_post' %}">
+          {% csrf_token %}
+          <input type="hidden" name="post_id" value="{{ post.id }}">
+          <button type="submit" class="btn btn-sm btn-outline-primary">
+            👍 {{ post.likes|default:0 }}
+          </button>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>게시물이 없습니다.</p>
+  {% endif %}
+</div>
+
+
+    <!-- 오른쪽 만들기 버튼 -->
+    <div class="right-panel text-center">
+      <h5>✍️ 만들기</h5>
+      <a href="{% url 'enchant_recommender:recommender' %}" class="btn btn-success mt-3">새 인챈트 시뮬레이터</a>
+    </div>
+  </div>
+</body>
+</html>

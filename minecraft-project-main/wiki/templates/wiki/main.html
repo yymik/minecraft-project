@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} - 스티븐 위키{% endblock %}
+{% block content %}
+  <title>스티븐 위키</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; }
+    header { background: #2c3e50; color: white; padding: 10px 20px; }
+    nav { background: #34495e; padding: 10px 20px; display: flex; gap: 10px; }
+    nav a { color: white; text-decoration: none; cursor: pointer; }
+    #content-area { padding: 20px; }
+  </style>
+</head>
+<body>
+  <header><h1>스티븐 위키</h1></header>
+
+  <nav>
+    <a onclick="loadWiki('튜토리얼')">튜토리얼</a>
+    <a onclick="loadWiki('게임_시작하기')">게임 시작하기</a>
+    <a onclick="loadWiki('인챈트')">인챈트</a>
+    <a onclick="loadWiki('양조')">양조</a>
+  </nav>
+
+  <div id="content-area"><p>문서를 선택해주세요.</p></div>
+
+  <script>
+    function loadWiki(title) {
+      fetch(`/wiki/${title}/partial`)
+        .then(response => {
+          if (!response.ok) throw new Error("문서를 불러오지 못했습니다.");
+          return response.text();
+        })
+        .then(html => {
+          document.getElementById('content-area').innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById('content-area').innerHTML = `<p style="color:red;">오류: ${err.message}</p>`;
+        });
+    }
+  </script>
+</body>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft 유저 정보 검색</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+        .error { color: red; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 8px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>마인크래프트 유저 정보 검색</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="닉네임 입력" required>
+        <button type="submit">검색</button>
+    </form>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if username %}
+    <div class="result">
+        <h2>검색 결과</h2>
+        <p><b>닉네임:</b> {{ username }}</p>
+        <p><b>UUID:</b> {{ uuid }}</p>
+
+        {% if name_history %}
+        <h3>닉네임 변경 기록</h3>
+        <table>
+            <tr>
+                <th>닉네임</th>
+                <th>변경 시점</th>
+            </tr>
+            {% for name in name_history %}
+            <tr>
+                <td>{{ name.name }}</td>
+                <td>
+                    {% if name.changedToAt %}
+                        {{ name.changedToAt|date:"Y-m-d H:i:s" }}
+                    {% else %}
+                        최초 닉네임
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
