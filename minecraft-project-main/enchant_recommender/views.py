@@ -3,6 +3,9 @@ from pymongo import MongoClient
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect
 from bson import ObjectId
+from .models import EnchantmentRecommendation
+from django.contrib.auth.decorators import login_required # 로그인 여부 확인 데코레이터
+from django.contrib import messages
 
 client = MongoClient("mongodb://localhost:27017")
 db = client["minecraft"]
@@ -53,6 +56,28 @@ ITEM_TYPES = {
     "all_armor": "모든 갑옷",
     "all": "모든 아이템"
 }
+# 3. 인챈트 적용 가능 여부를 판단하는 헬퍼 함수 (재사용성을 위해 분리)
+def get_applicable_enchants(selected_item_type, exclude_enchants_ids=None):
+    if exclude_enchants_ids is None:
+        exclude_enchants_ids = []
+
+    applicable = {}
+    for eid, edata in ENCHANTMENTS.items():
+        if eid in exclude_enchants_ids:
+            continue
+
+        can_apply = False
+        for target in edata["target_items"]:
+            if target == selected_item_type or \
+               target == "all" or \
+               (target == "all_tools" and selected_item_type in ["pickaxe", "axe", "shovel", "hoe", "shears"]) or \
+               (target == "all_armor" and selected_item_type in ["helmet", "chestplate", "leggings", "boots"]) or \
+               (target == "weapon" and selected_item_type in ["sword", "axe", "bow", "crossbow"]):
+                can_apply = True
+                break
+        if can_apply:
+            applicable[eid] = edata
+    return applicable
 
 def like_post(request):
     if request.method == "POST":
@@ -71,138 +96,157 @@ def like_post(request):
 from django.shortcuts import render, redirect
 from bson import ObjectId
 
+
 def recommender_view(request):
-    # --- 1. URL에서 post_id로 불러오기 ---
-    post_id = request.GET.get("post_id")
-    if post_id:
-        try:
-            post = posts_collection.find_one({"_id": ObjectId(post_id)})
-        except Exception:
-            post = None
-
-        if post:
-            # 게시물 내용에서 인챈트 추출
-            content = post.get("content", "")
-            selected_item_type = "sword"  # TODO: 게시물 저장할 때 item_type을 따로 저장해두면 더 정확함
-            recommended_enchants_ids = []
-
-            for eid, edata in ENCHANTMENTS.items():
-                if edata["name"] in content:
-                    recommended_enchants_ids.append(eid)
-
-            # 세션 초기화 후 반영
-            request.session['recommended_enchants_ids'] = recommended_enchants_ids
-            request.session['general_enchants_ids'] = []
-            request.session['not_recommended_enchants_ids'] = []
-            request.session['selected_item_type'] = selected_item_type
-
-            return redirect("enchant_recommender:recommender")
-
-    # --- 2. 세션에서 현재 상태 가져오기 ---
+    # 세션에서 현재 분류 상태 가져오기 또는 초기화
+    # 각 카테고리에는 인챈트 ID 리스트가 저장됨
     recommended_enchants_ids = request.session.get('recommended_enchants_ids', [])
     general_enchants_ids = request.session.get('general_enchants_ids', [])
     not_recommended_enchants_ids = request.session.get('not_recommended_enchants_ids', [])
-    selected_item_type = request.session.get('selected_item_type', 'sword')
 
-    message = None
+    # 현재 선택된 장비 아이템 (예: "sword", "pickaxe")
+    selected_item_type = request.session.get('selected_item_type', 'sword')  # 기본값 검
 
-    # --- 3. POST 요청 처리 ---
+    message = None  # messages 프레임워크 사용을 위해 직접 메시지 변수는 사용하지 않도록 변경됨
+
     if request.method == "POST":
         action = request.POST.get("action")
         enchant_id = request.POST.get("enchant_id")
-        target_category = request.POST.get("target_category")
+        target_category = request.POST.get("target_category")  # "recommended", "general", "not_recommended"
         item_type_from_form = request.POST.get("item_type")
 
         if action == "select_item_type":
             if item_type_from_form in ITEM_TYPES:
                 selected_item_type = item_type_from_form
-                # 아이템 타입 바꾸면 초기화
+                # 아이템 타입 변경 시 분류 초기화 (선택사항)
                 recommended_enchants_ids = []
                 general_enchants_ids = []
                 not_recommended_enchants_ids = []
-                message = f"'{ITEM_TYPES[selected_item_type]}'에 대한 인챈트 분류를 시작합니다."
+                messages.info(request, f"'{ITEM_TYPES[selected_item_type]}'에 대한 인챈트 분류를 시작합니다.")
             else:
-                message = "잘못된 아이템 타입입니다."
+                messages.error(request, "잘못된 아이템 타입입니다.")
 
         elif action == "move_enchant" and enchant_id in ENCHANTMENTS:
-            # 모든 카테고리에서 제거
-            for lst in [recommended_enchants_ids, general_enchants_ids, not_recommended_enchants_ids]:
-                if enchant_id in lst:
-                    lst.remove(enchant_id)
+            # 먼저 모든 카테고리에서 해당 인챈트 제거
+            if enchant_id in recommended_enchants_ids: recommended_enchants_ids.remove(enchant_id)
+            if enchant_id in general_enchants_ids: general_enchants_ids.remove(enchant_id)
+            if enchant_id in not_recommended_enchants_ids: not_recommended_enchants_ids.remove(enchant_id)
 
-            # 지정한 카테고리에 추가
+            # 대상 카테고리에 추가
             if target_category == "recommended":
                 recommended_enchants_ids.append(enchant_id)
-                message = f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 추천 인챈트로 이동했습니다."
+                messages.info(request, f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 추천 인챈트로 이동했습니다.")
             elif target_category == "general":
                 general_enchants_ids.append(enchant_id)
-                message = f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 일반 인챈트로 이동했습니다."
+                messages.info(request, f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 일반 인챈트로 이동했습니다.")
             elif target_category == "not_recommended":
                 not_recommended_enchants_ids.append(enchant_id)
-                message = f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 비추천 인챈트로 이동했습니다."
-            elif target_category == "available":
-                message = f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 목록으로 되돌렸습니다."
+                messages.info(request, f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 비추천 인챈트로 이동했습니다.")
+            elif target_category == "available":  # "사용 가능"으로 이동 (즉, 어떤 카테고리에도 속하지 않음)
+                messages.info(request, f"'{ENCHANTMENTS[enchant_id]['name']}'을(를) 사용 가능한 인챈트 목록으로 되돌렸습니다.")
             else:
-                message = "잘못된 대상 카테고리입니다."
+                messages.error(request, "잘못된 대상 카테고리입니다.")
 
         elif action == "reset_all":
             recommended_enchants_ids = []
             general_enchants_ids = []
             not_recommended_enchants_ids = []
-            selected_item_type = 'sword'
-            message = "모든 분류를 초기화했습니다."
+            selected_item_type = 'sword'  # 기본값으로 초기화
+            messages.info(request, "모든 분류를 초기화했습니다.")
 
-        elif action == "save_post":
-            title = request.POST.get("title", "새 인챈트 빌드")
-            content = f"{ITEM_TYPES[selected_item_type]} 추천 인챈트: " \
-                      f"{', '.join([ENCHANTMENTS[e]['name'] for e in recommended_enchants_ids])}"
+        elif action == "save_recommendation":
+            if not request.user.is_authenticated:
+                messages.error(request, "로그인 후 저장할 수 있습니다.")
+                # 'accounts:login'은 실제 로그인 URL 패턴 이름으로 바꿔주세요.
+                # 예시: return redirect('login') 또는 return redirect('/accounts/login/')
+                return redirect('accounts:login')
 
-            posts_collection.insert_one({
-                "title": title,
-                "content": content,
-                "item_type": selected_item_type
-            })
-            return redirect("enchant_recommender:main")
+            memo_content = request.POST.get("memo_content", "").strip()
 
-        # 세션 업데이트
+            if not (recommended_enchants_ids or general_enchants_ids or not_recommended_enchants_ids):
+                messages.warning(request, "아직 분류된 인챈트가 없습니다. 먼저 인챈트를 분류해주세요.")
+            else:
+                EnchantmentRecommendation.objects.create(
+                    user=request.user,
+                    item_type=selected_item_type,
+                    recommended_enchants=recommended_enchants_ids,
+                    general_enchants=general_enchants_ids,
+                    not_recommended_enchants=not_recommended_enchants_ids,
+                    memo=memo_content
+                )
+                messages.success(request, f"'{ITEM_TYPES[selected_item_type]}' 인챈트 추천이 성공적으로 저장되었습니다!")
+
+                # 저장 후 세션 초기화 (새로운 추천을 시작하도록)
+                request.session['recommended_enchants_ids'] = []
+                request.session['general_enchants_ids'] = []
+                request.session['not_recommended_enchants_ids'] = []
+                request.session['selected_item_type'] = 'sword'
+
+                # 저장된 게시물의 상세 페이지나 목록으로 리다이렉트
+                return redirect('enchant_recommender:list')
+
+        # 세션에 변경된 상태 저장
         request.session['recommended_enchants_ids'] = recommended_enchants_ids
         request.session['general_enchants_ids'] = general_enchants_ids
         request.session['not_recommended_enchants_ids'] = not_recommended_enchants_ids
         request.session['selected_item_type'] = selected_item_type
 
-        return redirect("enchant_recommender:recommender")
+        return redirect('enchant_recommender:recommender')  # POST 후 Redirect (PRG 패턴)
 
-    # --- 4. 적용 가능한 인챈트 필터링 ---
-    available_enchants = {}
+    # GET 요청 처리 (페이지 처음 로드 또는 POST 후 리다이렉트 시)
+    # 현재 선택된 아이템 타입에 적용 가능한 인챈트 필터링
     classified_ids = set(recommended_enchants_ids + general_enchants_ids + not_recommended_enchants_ids)
+    available_enchants = get_applicable_enchants(selected_item_type, exclude_enchants_ids=list(classified_ids))
 
-    for eid, edata in ENCHANTMENTS.items():
-        if eid not in classified_ids:
-            can_apply = False
-            for target in edata["target_items"]:
-                if (
-                    target == selected_item_type
-                    or target == "all"
-                    or (target == "all_tools" and selected_item_type in ["pickaxe", "axe", "shovel", "hoe", "shears"])
-                    or (target == "all_armor" and selected_item_type in ["helmet", "chestplate", "leggings", "boots"])
-                    or (target == "weapon" and selected_item_type in ["sword", "axe", "bow", "crossbow"])
-                ):
-                    can_apply = True
-                    break
-            if can_apply:
-                available_enchants[eid] = edata
-
-    # --- 5. 컨텍스트 구성 ---
     context = {
-        "item_types": ITEM_TYPES,
-        "selected_item_type": selected_item_type,
-        "selected_item_name": ITEM_TYPES.get(selected_item_type, "알 수 없는 아이템"),
-        "all_enchants_data": ENCHANTMENTS,
-        "available_enchants": available_enchants,
-        "recommended_enchants_ids": recommended_enchants_ids,
-        "general_enchants_ids": general_enchants_ids,
-        "not_recommended_enchants_ids": not_recommended_enchants_ids,
-        "message": request.session.pop("message", message),
+        'item_types': ITEM_TYPES,
+        'selected_item_type': selected_item_type,
+        'selected_item_name': ITEM_TYPES.get(selected_item_type, "알 수 없는 아이템"),
+        'all_enchants_data': ENCHANTMENTS,  # 템플릿에서 ID로 정보 참조 시 필요
+        'available_enchants': available_enchants,  # 아직 분류 안 된, 현재 아이템에 적용 가능한 인챈트
+        'recommended_enchants_ids': recommended_enchants_ids,
+        'general_enchants_ids': general_enchants_ids,
+        'not_recommended_enchants_ids': not_recommended_enchants_ids,
+        # message는 messages 프레임워크를 통해 템플릿에 전달되므로 여기서는 필요 없음
     }
 
     return render(request, "enchant_recommender/recommender.html", context)
+
+
+# --- 아래는 새로 추가된 뷰들입니다. (recommender_view 전문에는 포함되지 않지만, views.py 전체를 위해서는 필요) ---
+
+def recommendation_list_view(request):
+    """
+    저장된 모든 인챈트 추천 게시물 목록을 보여주는 뷰.
+    """
+    recommendations = EnchantmentRecommendation.objects.all()
+    context = {
+        'recommendations': recommendations,
+        'item_types': ITEM_TYPES,
+        'ENCHANTMENTS': ENCHANTMENTS,
+    }
+    return render(request, "enchant_recommender/recommendation_list.html", context)
+
+
+def recommendation_detail_view(request, pk):
+    """
+    저장된 특정 인챈트 추천 게시물의 상세 내용을 보여주는 뷰.
+    수정 불가능한 '사진'처럼 표시됩니다.
+    """
+    recommendation = get_object_or_404(EnchantmentRecommendation, pk=pk)
+
+    # 저장된 ID 리스트를 실제 인챈트 데이터 객체 리스트로 변환
+    recommended_enchants_data = [ENCHANTMENTS.get(eid) for eid in recommendation.recommended_enchants if
+                                 ENCHANTMENTS.get(eid)]
+    general_enchants_data = [ENCHANTMENTS.get(eid) for eid in recommendation.general_enchants if ENCHANTMENTS.get(eid)]
+    not_recommended_enchants_data = [ENCHANTMENTS.get(eid) for eid in recommendation.not_recommended_enchants if
+                                     ENCHANTMENTS.get(eid)]
+
+    context = {
+        'recommendation': recommendation,
+        'item_type_name': ITEM_TYPES.get(recommendation.item_type, recommendation.item_type),
+        'recommended_enchants': recommended_enchants_data,
+        'general_enchants': general_enchants_data,
+        'not_recommended_enchants': not_recommended_enchants_data,
+    }
+    return render(request, "enchant_recommender/recommendation_detail.html", context)

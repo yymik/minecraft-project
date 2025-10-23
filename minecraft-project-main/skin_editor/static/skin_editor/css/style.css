@@ -210,4 +210,24 @@ main {
     #skinPreview {
         height: 260px; /* 미리보기 높이도 줄임 */
     }
+    .canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.canvas-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  background: #f9f9f9;
+  border-radius: 10px;
+}
+
+.canvas-box canvas {
+  border: 1px solid #999;
+  cursor: crosshair;
+}
+
 }
