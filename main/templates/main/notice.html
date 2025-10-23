@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}공지사항 - 스티븐 위키{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-bullhorn text-primary me-2"></i>공지사항
+            </h1>
+            
+            <!-- 공지사항 목록 -->
+            <div class="list-group">
+                {% for notice in notices %}
+                <div class="list-group-item {% if notice.important %}list-group-item-warning{% endif %}">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <h5 class="mb-0 me-3">
+                                    {% if notice.important %}
+                                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                    {% endif %}
+                                    {{ notice.title }}
+                                </h5>
+                                {% if notice.important %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-star"></i> 중요
+                                </span>
+                                {% endif %}
+                            </div>
+                            <p class="mb-2">{{ notice.content }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ notice.date }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- 이전 공지사항 -->
+            <div class="mt-4">
+                <h4 class="mb-3">이전 공지사항</h4>
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">위키 시스템 업데이트</h6>
+                            <small>2025-01-01</small>
+                        </div>
+                        <p class="mb-1">새로운 편집 시스템이 도입되었습니다.</p>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">챗봇 베타 서비스 시작</h6>
+                            <small>2024-12-25</small>
+                        </div>
+                        <p class="mb-1">마인크래프트 챗봇 서비스가 베타로 시작되었습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 관리자 전용 -->
+            {% if user.is_staff %}
+            <div class="mt-4">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cog me-2"></i>관리자 도구
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary me-2">
+                            <i class="fas fa-plus me-1"></i>새 공지사항 작성
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-edit me-1"></i>공지사항 관리
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.list-group-item-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.card-header {
+    font-weight: 600;
+}
+</style>
+{% endblock %}

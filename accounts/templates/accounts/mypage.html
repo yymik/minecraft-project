@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}마이페이지{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- 사이드바 -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>마이페이지</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
+                        <i class="fas fa-user me-2"></i>프로필 정보
+                    </a>
+                    <a href="#wiki-history" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                        <i class="fas fa-edit me-2"></i>위키 작성 이력
+                    </a>
+                    <a href="#settings" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                        <i class="fas fa-cog me-2"></i>설정
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <!-- 메인 콘텐츠 -->
+            <div class="tab-content">
+                <!-- 프로필 정보 탭 -->
+                <div class="tab-pane fade show active" id="profile">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-user me-2"></i>프로필 정보</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>사용자명:</strong></td>
+                                            <td>{{ user.username }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>이메일:</strong></td>
+                                            <td>{{ user.email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>가입일:</strong></td>
+                                            <td>{{ user.date_joined|date:"Y년 m월 d일" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>마지막 로그인:</strong></td>
+                                            <td>
+                                                {% if user.last_login %}
+                                                    {{ user.last_login|date:"Y년 m월 d일 H:i" }}
+                                                {% else %}
+                                                    없음
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Minecraft UUID:</strong></td>
+                                            <td>
+                                                {% if profile and profile.minecraft_uuid %}
+                                                    <code>{{ profile.minecraft_uuid }}</code>
+                                                {% else %}
+                                                    <span class="text-muted">설정되지 않음</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>계정 상태:</strong></td>
+                                            <td>
+                                                {% if user.is_active %}
+                                                    <span class="badge bg-success">활성화</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">비활성화</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                    <i class="fas fa-edit me-2"></i>프로필 수정
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 위키 작성 이력 탭 -->
+                <div class="tab-pane fade" id="wiki-history">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-edit me-2"></i>위키 작성 이력</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if wiki_pages %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>제목</th>
+                                                <th>작성일</th>
+                                                <th>수정일</th>
+                                                <th>상태</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for page in wiki_pages %}
+                                            <tr>
+                                                <td>
+                                                    <a href="#" class="text-decoration-none">
+                                                        {{ page.title|truncatechars:50 }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ page.created_at|date:"Y-m-d H:i" }}</td>
+                                                <td>{{ page.updated_at|date:"Y-m-d H:i" }}</td>
+                                                <td>
+                                                    {% if page.is_published %}
+                                                        <span class="badge bg-success">게시됨</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">임시저장</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="fas fa-file-alt text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mt-3">작성한 위키 페이지가 없습니다.</p>
+                                    <a href="{% url 'wiki:wiki_main' %}" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>새 위키 작성
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 설정 탭 -->
+                <div class="tab-pane fade" id="settings">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-cog me-2"></i>계정 설정</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="{% url 'accounts:forgot' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-key me-2"></i>비밀번호 변경
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-bell me-2"></i>알림 설정
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-shield-alt me-2"></i>개인정보 보호
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 프로필 수정 모달 -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">프로필 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'accounts:mypage' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">사용자명</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="minecraft_uuid" class="form-label">Minecraft UUID</label>
+                        <input type="text" class="form-control" id="minecraft_uuid" name="minecraft_uuid" 
+                               value="{% if profile %}{{ profile.minecraft_uuid }}{% endif %}" 
+                               placeholder="Minecraft UUID를 입력하세요">
+                        <div class="form-text">32자리 또는 하이픈 포함 36자리 형식으로 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.list-group-item.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+</style>
+{% endblock %}

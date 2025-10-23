@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}문의처 - 스티븐 위키{% endblock %}
+{% block content %}
+<h2>문의하기</h2>
+{% if success %}
+<p style="color:green;">접수되었습니다. 빠르게 확인하겠습니다.</p>
+{% endif %}
+<form method="POST">
+  {% csrf_token %}
+  <input type="text" name="name" placeholder="이름 (선택)" style="width:100%;"><br><br>
+  <input type="email" name="email" placeholder="이메일 (선택)" style="width:100%;"><br><br>
+  <textarea name="message" rows="6" style="width:100%;" placeholder="문의 내용을 적어주세요." required></textarea><br>
+  <button type="submit">보내기</button>
+</form>
+{% endblock %}
+

@@ -1,18 +1,18 @@
 from django.contrib import admin
 from django.urls import path, include
-from main import views as main_views  # ← main 앱에 home_view가 있는 경우 기준
 
 urlpatterns = [
-    path('', main_views.home_view, name='home'),  # / => home.html 위키 대문 통합 구조
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls', namespace='accounts')),
-    path('', include('main.urls')),  # 홈 네임스페이스가 'home' pointing 되도록
-    path('main/', include('main.urls')),  # 필요 시 유지, but 메인 역할은 위에서 함
-    path('chatbot/', include('chatbot.urls')),
-    path('potions/', include('potions.urls')),
-    path('enchant-recommender/', include('enchant_recommender.urls')),
-    path('wiki/', include(('wiki.urls', 'wiki'), namespace='wiki')),  # 개별 문서/편집용
-    path('skin-editor/', include('skin_editor.urls')),
-    path('save-analyzer/', include('save_analyzer.urls')), 
 
+    # 홈/공지/튜토/토론/역사 등은 main.urls가 전부 담당
+    path('', include(('main.urls', 'main'), namespace='main')),
+
+    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('chatbot/', include(('chatbot.urls', 'chatbot'), namespace='chatbot')),
+    path('potions/', include(('potions.urls', 'potions'), namespace='potions')),
+    path('enchant-recommender/', include(('enchant_recommender.urls', 'enchant_recommender'),
+                                         namespace='enchant_recommender')),
+    path('wiki/', include(('wiki.urls', 'wiki'), namespace='wiki')),
+    path('skin-editor/', include(('skin_editor.urls', 'skin_editor'), namespace='skin_editor')),
+    path('save-analyzer/', include(('save_analyzer.urls', 'save_analyzer'), namespace='save_analyzer')),
 ]

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}최근 토론 - 스티븐 위키{% endblock %}
+{% block content %}
+<h2>최근 토론</h2>
+{% if load_error %}
+<div class="alert alert-warning">{{ load_error }}</div>
+{% endif %}
+<p><a href="{% url 'wiki:discussion_new' %}">새 토론 만들기</a></p>
+<table border="1" cellspacing="0" cellpadding="6">
+  <tr><th>제목</th><th>최근 댓글 시각</th></tr>
+  {% for t in topics %}
+  <tr>
+    <td><a href="{% url 'wiki:discussion_detail' t.topic_id %}">{{ t.title }}</a></td>
+    <td>{{ t.last_commented_at|default:t.created_at }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="2">토론이 없습니다.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
+

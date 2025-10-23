@@ -136,14 +136,17 @@
 <div class="top-bar">
   <div class="top-bar-left">
     <strong>스티븐 위키</strong>
-    <a href="#" class="btn btn-primary btn-sm">최근 변경</a>
-    <a href="#" class="btn btn-primary btn-sm">최근 토론</a>
+    <a href="/wiki/recent-changes/" class="btn btn-primary btn-sm">최근 변경</a>
+    <a href="/wiki/discussions/" class="btn btn-primary btn-sm">최근 토론</a>
   </div>
   <div class="top-bar-right">
     {% if user.is_authenticated %}
       <span><strong>{{ user.username }}</strong>님, 환영합니다.</span>
-      <a href="#" class="btn btn-outline-secondary btn-sm">내 기여</a>
-      <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm">로그아웃</a>
+      <a href="{% url 'accounts:mypage' %}" class="btn btn-outline-secondary btn-sm">내 기여</a>
+      <form action="{% url 'accounts:logout' %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger btn-sm">로그아웃</button>
+      </form>
     {% else %}
       <span>로그인해주세요.</span>
       <!-- 회원가입 링크: accounts 앱의 'register'라는 이름의 URL을 찾아감 -->
@@ -158,18 +161,25 @@
 
 <!-- 검색 -->
 <div class="search-bar text-center">
-  <input type="text" class="form-control" placeholder="여기에 검색">
+  <form method="GET" action="{% url 'wiki:wiki_search' %}">
+    <div class="input-group">
+      <input type="text" class="form-control" name="q" placeholder="여기에 검색" required>
+      <button class="btn btn-primary" type="submit">
+        <i class="fas fa-search"></i> 검색
+      </button>
+    </div>
+  </form>
 </div>
 
 <!-- 탭 영역 -->
 <div class="tab-area">
   <div class="tab-left">
-    <a href="/discussion" class="btn btn-info">토론</a>
-    <a href="/history" class="btn btn-info">역사</a>
+    <a href="{% url 'main:discussion' %}" class="btn btn-info">토론</a>
+    <a href="{% url 'main:history' %}" class="btn btn-info">역사</a>
   </div>
   <div class="tab-right">
-    <a href="/notice" class="btn btn-info">공지사항</a>
-    <a href="/tutorial" class="btn btn-info">튜토리얼</a>
+    <a href="{% url 'main:notice' %}" class="btn btn-info">공지사항</a>
+    <a href="{% url 'main:tutorial' %}" class="btn btn-info">튜토리얼</a>
   </div>
 </div>
 
@@ -185,23 +195,25 @@
           </a>
         </h5>
         <p>{{ main_doc.content|linebreaksbr }}</p>
+        <a href="/wiki/" class="btn btn-outline-primary btn-sm">대문</a>
       {% else %}
         <h5>대문 문서를 찾을 수 없습니다</h5>
         <p>위키 메인 문서가 아직 작성되지 않았습니다.</p>
+        <a href="/wiki/" class="btn btn-outline-primary btn-sm">대문</a>
       {% endif %}
     </div>
 
     <div class="black-box">
       <strong>📌 위키에 처음 오셨나요?</strong><br>
-      규칙 · 포맷가이드 · 문의처 · 운영진 모집 · 질문 게시판 등등 확인해보세요.
+      <a href="/wiki/규칙/">규칙</a> · <a href="/wiki/포맷가이드/">포맷가이드</a> · <a href="/wiki/contact/">문의처</a> · <a href="/wiki/recruit/">운영진 모집</a> · <a href="/wiki/qa/">질문 게시판</a> 등등 확인해보세요.
     </div>
 
     <div class="category-buttons">
-      <button class="btn btn-secondary">거래</button>
-      <button class="btn btn-secondary">양조</button>
-      <button class="btn btn-secondary">몹</button>
-      <button class="btn btn-secondary">블록</button>
-      <button class="btn btn-secondary">아이템</button>
+      <a href="{% url 'wiki:wiki_category' 'trade' %}" class="btn btn-secondary">거래</a>
+      <a href="{% url 'wiki:wiki_category' 'brewing' %}" class="btn btn-secondary">양조</a>
+      <a href="{% url 'wiki:wiki_category' 'mobs' %}" class="btn btn-secondary">몹</a>
+      <a href="{% url 'wiki:wiki_category' 'blocks' %}" class="btn btn-secondary">블록</a>
+      <a href="{% url 'wiki:wiki_category' 'items' %}" class="btn btn-secondary">아이템</a>
     </div>
 
     <!-- 버전 정보 -->
@@ -246,16 +258,16 @@
       <a href="/enchant-recommender/" class="btn btn-success">인챈트 시뮬레이터</a>
       <a href="/potions/simulator/" class="btn btn-success">양조 시뮬레이터</a>
       <a href="/save-analyzer/upload/" class="btn btn-success">도전과제 정보</a>
-      <a href="/wiki/challenge-ranking/" class="btn btn-success">도전과제 랭킹</a>
+      <a href="/wiki/recent-changes/" class="btn btn-success">최근 변경</a>
       <a href="/chatbot/user-info/" class="btn btn-success">마크 유저 조회</a>
       <a href="/skin-editor/" class="btn btn-success">스킨 생성/편집기</a>
     </div>
 
     <h6 class="mt-4">자주 찾는 문서</h6>
     <ul class="small">
-      <li>○ 문서 1</li>
-      <li>○ 문서 2</li>
-      <li>○ 문서 3</li>
+      <li>○ <a href="{% url 'wiki:wiki_detail' '다이아몬드 광석 채굴 가이드' %}" class="text-decoration-none">다이아몬드 광석 채굴 가이드</a></li>
+      <li>○ <a href="{% url 'wiki:wiki_detail' '네더라이트 업그레이드 단계별 안내' %}" class="text-decoration-none">네더라이트 업그레이드 단계별 안내</a></li>
+      <li>○ <a href="{% url 'wiki:wiki_detail' '엔더 드래곤 전투 전략' %}" class="text-decoration-none">엔더 드래곤 전투 전략</a></li>
     </ul>
   </div>
 </div>

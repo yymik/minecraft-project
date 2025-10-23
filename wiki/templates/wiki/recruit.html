@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}운영진 모집 - 스티븐 위키{% endblock %}
+{% block content %}
+<h2>운영진 모집</h2>
+{% if success %}
+<p style="color:green;">지원이 접수되었습니다.</p>
+{% endif %}
+<form method="POST">
+  {% csrf_token %}
+  <input type="text" name="name" placeholder="이름" style="width:100%;" required><br><br>
+  <input type="text" name="role" placeholder="희망 역할 (예: 관리자/모더레이터)" style="width:100%;" required><br><br>
+  <textarea name="intro" rows="6" style="width:100%;" placeholder="자기소개 및 경험"></textarea><br>
+  <button type="submit">지원하기</button>
+</form>
+{% endblock %}
+

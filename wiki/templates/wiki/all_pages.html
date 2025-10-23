@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load wiki_filters %}
+{% block title %}위키 전체 문서 보기{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="mb-4">
+        <h1 class="h3 mb-1"><i class="fas fa-list-ul me-2"></i>전체 문서 목록</h1>
+        <p class="text-muted mb-1">현재 데이터베이스에 등록된 모든 위키 문서를 한눈에 확인할 수 있는 임시 페이지입니다.</p>
+        <span class="badge bg-primary">총 {{ total_count }}개 문서</span>
+      </div>
+
+      {% if pages %}
+      <div class="list-group">
+        {% for page in pages %}
+        <a href="{% url 'wiki:wiki_detail' page.title|wiki_title_path %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+          <div>
+            <strong>{{ page.title }}</strong>
+            {% if page.summary %}
+              <div class="small text-muted">{{ page.summary|truncatechars:80 }}</div>
+            {% endif %}
+          </div>
+          <span class="badge bg-secondary">{{ page.category|default:"기타" }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="alert alert-warning">
+          표시할 문서가 없습니다. 시드 데이터를 적용했는지 확인해주세요.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

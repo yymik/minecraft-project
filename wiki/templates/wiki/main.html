@@ -1,41 +1,242 @@
 {% extends "base.html" %}
-{% block title %}{{ page.title }} - 스티븐 위키{% endblock %}
+{% block title %}스티븐 위키 - 마인크래프트 위키{% endblock %}
+
 {% block content %}
-  <title>스티븐 위키</title>
-  <style>
-    body { font-family: sans-serif; margin: 0; padding: 0; }
-    header { background: #2c3e50; color: white; padding: 10px 20px; }
-    nav { background: #34495e; padding: 10px 20px; display: flex; gap: 10px; }
-    nav a { color: white; text-decoration: none; cursor: pointer; }
-    #content-area { padding: 20px; }
-  </style>
-</head>
-<body>
-  <header><h1>스티븐 위키</h1></header>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- 위키 헤더 -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-primary mb-3">
+                    <i class="fas fa-book me-3"></i>스티븐 위키
+                </h1>
+                <p class="lead text-muted">마인크래프트의 모든 것을 담은 위키</p>
+                <a href="{% url 'main:home' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-home me-1"></i>메인 페이지로 돌아가기
+                </a>
+            </div>
 
-  <nav>
-    <a onclick="loadWiki('튜토리얼')">튜토리얼</a>
-    <a onclick="loadWiki('게임_시작하기')">게임 시작하기</a>
-    <a onclick="loadWiki('인챈트')">인챈트</a>
-    <a onclick="loadWiki('양조')">양조</a>
-  </nav>
+            <!-- 검색 영역 -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-body p-4">
+                            <form id="searchForm" method="GET" action="{% url 'wiki:wiki_search' %}">
+                                <div class="input-group input-group-lg">
+                                    <input type="text" class="form-control" name="q" id="searchInput" 
+                                           placeholder="마인크래프트 관련 검색..." autocomplete="off">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search me-2"></i>검색
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <!-- 검색 필터 -->
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <select class="form-select" id="sortFilter">
+                                        <option value="relevance">정확도순</option>
+                                        <option value="date">최신순</option>
+                                        <option value="views">조회수순</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select" id="categoryFilter">
+                                        <option value="">전체 카테고리</option>
+                                        <option value="광물">광물</option>
+                                        <option value="블록">블록</option>
+                                        <option value="아이템">아이템</option>
+                                        <option value="몹">몹</option>
+                                        <option value="인챈트">인챈트</option>
+                                        <option value="양조">양조</option>
+                                        <option value="구조물">구조물</option>
+                                        <option value="생물군계">생물군계</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <div id="content-area"><p>문서를 선택해주세요.</p></div>
+            <!-- 카테고리별 문서 -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-gem me-2"></i>광물
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '다이아몬드' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>다이아몬드
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '철 광석' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>철 광석
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '청금석' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>청금석
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '석탄' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>석탄
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-magic me-2"></i>인챈트
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '인챈트' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>인챈트
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '인챈트 테이블' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>인챈트 테이블
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-flask me-2"></i>양조
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '양조' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>양조
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-paw me-2"></i>몹
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '크리퍼' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>크리퍼
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'wiki:wiki_detail' '스켈레톤' %}" class="text-decoration-none">
+                                        <i class="fas fa-file-alt me-2"></i>스켈레톤
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+  </div>
+  </div>
+
+            <!-- 빠른 링크 -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-link me-2"></i>빠른 링크
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <a href="{% url 'wiki:recent_changes' %}" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="fas fa-history me-1"></i>최근 변경
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="{% url 'wiki:recent_discussions' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                        <i class="fas fa-comments me-1"></i>최근 토론
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="{% url 'wiki:contact' %}" class="btn btn-outline-info btn-sm w-100">
+                                        <i class="fas fa-envelope me-1"></i>문의처
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="{% url 'wiki:qa_list' %}" class="btn btn-outline-success btn-sm w-100">
+                                        <i class="fas fa-question-circle me-1"></i>질문 게시판
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
   <script>
-    function loadWiki(title) {
-      fetch(`/wiki/${title}/partial`)
-        .then(response => {
-          if (!response.ok) throw new Error("문서를 불러오지 못했습니다.");
-          return response.text();
-        })
-        .then(html => {
-          document.getElementById('content-area').innerHTML = html;
-        })
-        .catch(err => {
-          document.getElementById('content-area').innerHTML = `<p style="color:red;">오류: ${err.message}</p>`;
-        });
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const query = document.getElementById('searchInput').value.trim();
+    if (query) {
+        window.location.href = `{% url 'wiki:wiki_search' %}?q=${encodeURIComponent(query)}`;
     }
+});
+
+// 검색 필터 기능
+document.getElementById('sortFilter').addEventListener('change', function() {
+    const sort = this.value;
+    const category = document.getElementById('categoryFilter').value;
+    const query = document.getElementById('searchInput').value;
+    
+    if (query) {
+        let url = `{% url 'wiki:wiki_search' %}?q=${encodeURIComponent(query)}`;
+        if (sort) url += `&sort=${sort}`;
+        if (category) url += `&category=${encodeURIComponent(category)}`;
+        window.location.href = url;
+    }
+});
+
+document.getElementById('categoryFilter').addEventListener('change', function() {
+    const category = this.value;
+    const sort = document.getElementById('sortFilter').value;
+    const query = document.getElementById('searchInput').value;
+    
+    if (query) {
+        let url = `{% url 'wiki:wiki_search' %}?q=${encodeURIComponent(query)}`;
+        if (sort) url += `&sort=${sort}`;
+        if (category) url += `&category=${encodeURIComponent(category)}`;
+        window.location.href = url;
+    }
+});
   </script>
-</body>
 {% endblock %}

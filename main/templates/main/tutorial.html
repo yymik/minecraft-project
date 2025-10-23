@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}튜토리얼 - 스티븐 위키{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-graduation-cap text-primary me-2"></i>튜토리얼
+            </h1>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                위키에 처음 오셨나요? 아래 튜토리얼을 통해 위키 사용법을 익혀보세요!
+            </div>
+
+            <!-- 튜토리얼 목록 -->
+            <div class="row">
+                {% for tutorial in tutorials %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-book me-2"></i>{{ tutorial.title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ tutorial.content }}</p>
+                            
+                            <h6 class="mt-3 mb-2">
+                                <i class="fas fa-list-ol me-1"></i>단계별 가이드:
+                            </h6>
+                            <ol class="small">
+                                {% for step in tutorial.steps %}
+                                <li>{{ step }}</li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-play me-1"></i>시작하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- 추가 리소스 -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h3 class="mb-3">
+                        <i class="fas fa-external-link-alt me-2"></i>추가 리소스
+                    </h3>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-video text-success mb-3" style="font-size: 2rem;"></i>
+                                    <h5 class="card-title">동영상 가이드</h5>
+                                    <p class="card-text">위키 편집 방법을 동영상으로 학습하세요.</p>
+                                    <button class="btn btn-success">동영상 보기</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-file-pdf text-info mb-3" style="font-size: 2rem;"></i>
+                                    <h5 class="card-title">PDF 매뉴얼</h5>
+                                    <p class="card-text">상세한 매뉴얼을 PDF로 다운로드하세요.</p>
+                                    <button class="btn btn-info">다운로드</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-question-circle text-warning mb-3" style="font-size: 2rem;"></i>
+                                    <h5 class="card-title">FAQ</h5>
+                                    <p class="card-text">자주 묻는 질문과 답변을 확인하세요.</p>
+                                    <button class="btn btn-warning">FAQ 보기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 도움말 섹션 -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-secondary">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-life-ring me-2"></i>도움이 필요하신가요?
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-comments me-2"></i>커뮤니티 지원</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a href="/wiki/discussions/" class="text-decoration-none">토론 게시판</a></li>
+                                        <li><a href="/wiki/qa/" class="text-decoration-none">질문 게시판</a></li>
+                                        <li><a href="/chatbot/chat/" class="text-decoration-none">챗봇 문의</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-envelope me-2"></i>직접 문의</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a href="mailto:admin@stevenwiki.com" class="text-decoration-none">이메일 문의</a></li>
+                                        <li><a href="/wiki/contact/" class="text-decoration-none">문의처 정보</a></li>
+                                        <li><a href="/wiki/recruit/" class="text-decoration-none">운영진 모집</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+</style>
+{% endblock %}

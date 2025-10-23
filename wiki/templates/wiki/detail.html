@@ -1,8 +1,191 @@
 {% extends "base.html" %}
-{% block title %}{{ title }} 편집 - 스티븐 위키{% endblock %}
+{% load wiki_filters %}
+{% block title %}{{ title }} - 스티븐 위키{% endblock %}
+
 {% block content %}
-<h2>{{ title }}</h2>
-<hr>
-<div>{{ content|linebreaksbr }}</div>
-<p><a href="{% url 'wiki:wiki_edit' title %}">[편집]</a></p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- 문서 헤더 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0">
+                    <i class="fas fa-file-alt text-primary me-2"></i>{{ title }}
+                </h1>
+                <div class="btn-group">
+                    <a href="{% url 'wiki:wiki_edit' title|wiki_title_path %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>편집
+                    </a>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="history.back()">
+                        <i class="fas fa-arrow-left me-1"></i>뒤로
+                    </button>
+                </div>
+            </div>
+
+            <!-- 문서 메타 정보 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-tag me-1"></i>카테고리: {{ page.category|default:"기타" }}
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-eye me-1"></i>조회수: {{ page.view_count|default:0 }}
+                            </small>
+                        </div>
+                    </div>
+                    {% if page.tags %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-tags me-1"></i>태그: 
+                            {% for tag in page.tags|split:"," %}
+                                <span class="badge bg-secondary me-1">{{ tag|strip }}</span>
+                            {% endfor %}
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 문서 내용 -->
+            <div class="wiki-content">
+                {{ content|wiki_links|markdown_to_html|safe }}
+            </div>
+
+            <!-- 편집 정보 -->
+            <div class="mt-4 pt-3 border-top">
+                <small class="text-muted">
+                    <i class="fas fa-user me-1"></i>작성자: {{ page.author|default:"익명" }} |
+                    <i class="fas fa-clock me-1"></i>수정일: {{ page.updated_at|date:"Y-m-d H:i" }}
+                </small>
+            </div>
+        </div>
+
+        <!-- 사이드바 -->
+        <div class="col-md-4">
+            <!-- 관련 문서 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-link me-2"></i>관련 문서
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        {% for link in content|extract_links %}
+                        <li class="mb-2">
+                            <a href="{% url 'wiki:wiki_detail' link|wiki_title_path %}" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-1"></i>{{ link }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 카테고리별 문서 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-folder me-2"></i>{{ page.category|default:"기타" }} 카테고리
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <!-- 같은 카테고리의 다른 문서들 -->
+                        <li class="mb-2">
+                            <a href="#" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-1"></i>관련 문서 1
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-decoration-none">
+                                <i class="fas fa-file-alt me-1"></i>관련 문서 2
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 빠른 링크 -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>빠른 링크
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'wiki:wiki_edit' title|wiki_title_path %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>편집하기
+                        </a>
+                        <a href="{% url 'wiki:recent_changes' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-history me-1"></i>최근 변경
+                        </a>
+                        <a href="{% url 'wiki:wiki_main' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-home me-1"></i>위키 메인
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.wiki-content {
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.wiki-content h1, .wiki-content h2, .wiki-content h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.wiki-content h1 {
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+}
+
+.wiki-content h2 {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.3rem;
+}
+
+.wiki-link {
+    color: #007bff;
+    text-decoration: none;
+    border-bottom: 1px dotted #007bff;
+}
+
+.wiki-link:hover {
+    color: #0056b3;
+    text-decoration: none;
+    border-bottom: 1px solid #0056b3;
+}
+
+.wiki-link-missing {
+    color: #dc3545;
+    text-decoration: none;
+    border-bottom: 1px dotted #dc3545;
+}
+
+.wiki-link-missing:hover {
+    color: #c82333;
+    text-decoration: none;
+    border-bottom: 1px solid #c82333;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.badge {
+    font-size: 0.75em;
+}
+</style>
 {% endblock %}

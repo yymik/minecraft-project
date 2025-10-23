@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}마크 유저 조회{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h2 class="h4 mb-3">
+            <i class="bi bi-person-search me-2"></i>마인크래프트 유저 조회
+          </h2>
+          <p class="text-muted mb-4">
+            닉네임을 입력하면 UUID를 확인할 수 있습니다. 네트워크가 제한된 환경에서는 아래 샘플 데이터가 대신 표시됩니다.
+          </p>
+          <form method="post" class="row g-3">
+            {% csrf_token %}
+            <div class="col-md-9">
+              <input type="text"
+                     name="nickname"
+                     class="form-control form-control-lg"
+                     placeholder="예: Steve"
+                     value="{{ query|default:'' }}"
+                     required>
+            </div>
+            <div class="col-md-3 d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-search me-1"></i>조회하기
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+
+      {% if result %}
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            {% if result.skin_url %}
+              <img src="{{ result.skin_url }}"
+                   alt="{{ result.nickname }} 스킨"
+                   class="rounded me-3"
+                   style="width:72px; height:72px; object-fit:cover;">
+            {% endif %}
+            <div>
+              <h3 class="h5 mb-1">{{ result.nickname }}</h3>
+              <span class="badge bg-secondary">{{ result.source }}</span>
+            </div>
+          </div>
+          <dl class="row mb-0">
+            <dt class="col-sm-3">UUID</dt>
+            <dd class="col-sm-9"><code>{{ result.uuid }}</code></dd>
+            {% if result.last_seen %}
+            <dt class="col-sm-3">최근 확인</dt>
+            <dd class="col-sm-9">{{ result.last_seen }}</dd>
+            {% endif %}
+            {% if result.notes %}
+            <dt class="col-sm-3">메모</dt>
+            <dd class="col-sm-9">{{ result.notes }}</dd>
+            {% endif %}
+          </dl>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if recent_searches %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <strong><i class="bi bi-clock-history me-2"></i>최근 조회</strong>
+        </div>
+        <div class="card-body">
+          {% for nickname in recent_searches %}
+            <span class="badge bg-light text-dark me-1">{{ nickname }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <div class="card-header">
+          <strong><i class="bi bi-stars me-2"></i>샘플 플레이어</strong>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {% for player in sample_players %}
+            <div class="col-md-4">
+              <div class="border rounded p-3 h-100">
+                <h5>{{ player.nickname }}</h5>
+                <p class="small text-muted mb-1">UUID</p>
+                <code class="d-block mb-2 text-break">{{ player.uuid }}</code>
+                <p class="small text-muted mb-0">{{ player.notes }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

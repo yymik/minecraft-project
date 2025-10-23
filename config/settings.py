@@ -7,7 +7,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # 보안 관련 설정
 SECRET_KEY = 'django-insecure-*@3*4nz0i6-5&0cz25eg6s7d6nq@m^1tpue3@ek7)%t@gqf-+u'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "[::1]",
+    "0.0.0.0",
+    "testserver",
+]
 
 # 설치된 앱 목록
 INSTALLED_APPS = [
@@ -65,7 +71,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'minecraft_wiki.db',
     }
 }
 

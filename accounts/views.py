@@ -1,4 +1,3 @@
-# accounts/views.py
 import json, random
 from django.conf import settings
 from django.contrib import messages
@@ -11,6 +10,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.views.decorators.http import require_http_methods, require_POST
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
 from django.core.cache import cache
@@ -22,7 +22,7 @@ except Exception:
         def deco(fn): return fn
         return deco
 
-from .models import EmailVerificationToken
+from .models import EmailVerificationToken, UserProfile
 from .tokens import make_email_verify_token, read_email_verify_token
 
 UserModel = get_user_model()
@@ -49,22 +49,41 @@ def login_view(request):
         if request.GET.get("reset_sent") == "1":
             messages.info(request, "재설정 링크를 이메일로 전송했습니다. 메일함(스팸함 포함)을 확인하세요.")
         return render(request, "accounts/login.html")
-    username = request.POST.get("username", "")
+    
+    username = request.POST.get("username", "").strip()
     password = request.POST.get("password", "")
-    user = authenticate(request, username=username, password=password)
-    if not user:
+    
+    # 디버깅을 위한 로그
+    print(f"Login attempt: username='{username}', password_length={len(password)}")
+    
+    # 사용자 존재 확인
+    try:
+        user_obj = UserModel.objects.get(username=username)
+        print(f"User found: {user_obj.username}, is_active: {user_obj.is_active}")
+    except UserModel.DoesNotExist:
+        print(f"User '{username}' not found")
         messages.error(request, "아이디 또는 비밀번호가 올바르지 않습니다.")
         return render(request, "accounts/login.html")
+    
+    user = authenticate(request, username=username, password=password)
+    if not user:
+        print(f"Authentication failed for user '{username}'")
+        messages.error(request, "아이디 또는 비밀번호가 올바르지 않습니다.")
+        return render(request, "accounts/login.html")
+    
     if not user.is_active:
+        print(f"User '{username}' is not active")
         messages.error(request, "이메일 인증이 필요합니다. 가입 시 받은 메일을 확인하세요.")
         return render(request, "accounts/login.html")
+    
+    print(f"Login successful for user '{username}'")
     login(request, user)
-    return redirect("home")
+    return redirect("main:home")
 
 @require_http_methods(["POST"])
 def logout_view(request):
     logout(request)
-    return redirect("accounts:login")
+    return redirect("main:home")
 
 # ====== 회원가입 + 인증메일 발송 ======
 @require_http_methods(["GET", "POST"])
@@ -75,10 +94,11 @@ def register_view(request):
 
     username = request.POST.get("username", "").strip()
     email = _norm_email(request.POST.get("email"))
+    minecraft_uuid = request.POST.get("minecraft_uuid", "").strip()
     password = request.POST.get("password", "")
     password2 = request.POST.get("password2", "")
 
-    if not username or not email or not password:
+    if not username or not email or not minecraft_uuid or not password:
         messages.error(request, "필수 항목이 비었습니다.")
         return render(request, "accounts/register.html")
     if password != password2:
@@ -89,6 +109,12 @@ def register_view(request):
         return render(request, "accounts/register.html")
     if UserModel.objects.filter(email=email).exists():
         messages.error(request, "이미 사용 중인 이메일입니다.")
+        return render(request, "accounts/register.html")
+    
+    # UUID 중복 검사
+    normalized_uuid = minecraft_uuid.replace('-', '')
+    if UserProfile.objects.filter(minecraft_uuid__in=[minecraft_uuid, normalized_uuid]).exists():
+        messages.error(request, "이미 사용 중인 Minecraft UUID입니다.")
         return render(request, "accounts/register.html")
 
     # OTP 선검증을 사용하는 템플릿이면 최종 확인(없으면 건너뜀)
@@ -102,10 +128,14 @@ def register_view(request):
 
     with transaction.atomic():
         user = UserModel.create_user(
-            username=username, email=email, password=password, is_active=False
+            username=username, email=email, password=password, is_active=True
         ) if hasattr(UserModel, "create_user") else UserModel.objects.create_user(
-            username=username, email=email, password=password, is_active=False
+            username=username, email=email, password=password, is_active=True
         )
+        
+        # UserProfile 생성 (Minecraft UUID 포함)
+        UserProfile.objects.create(user=user, minecraft_uuid=normalized_uuid)
+        
         token = make_email_verify_token(user)
         EmailVerificationToken.objects.create(user=user, token=token, purpose="verify_email")
 
@@ -115,10 +145,23 @@ def register_view(request):
         "verify_link": verify_link,
     })
     subject = "[이메일 인증] 계정 활성화를 완료해주세요"
-    send_mail(subject, verify_link, settings.DEFAULT_FROM_EMAIL, [email], html_message=html)
+    try:
+        send_mail(subject, verify_link, settings.DEFAULT_FROM_EMAIL, [email], html_message=html, fail_silently=False)
+    except Exception as exc:
+        # 이메일 전송 실패 시에도 가입은 진행되도록 하고 안내 메시지 제공
+        messages.warning(request, "인증 메일을 보내지 못했습니다. 관리자에게 문의하거나 나중에 다시 시도해주세요.")
+        print(f"Email send failed for {email}: {exc}")
 
-    # ✅ 가입 완료 안내 전용 화면으로 렌더 (로그인 리다이렉트 대신)
-    return render(request, "accounts/verify_email_sent.html", {"email": email})
+    # ✅ 가입 완료 안내 전용 화면으로 리다이렉트
+    return redirect("accounts:register_complete", email=email, username=username)
+
+# ====== 회원가입 완료 페이지 ======
+@require_http_methods(["GET"])
+def register_complete_view(request, email, username):
+    return render(request, "accounts/register_complete.html", {
+        "email": email, 
+        "username": username
+    })
 
 # ====== 이메일 인증 처리 ======
 @require_http_methods(["GET"])
@@ -258,3 +301,64 @@ def reset_password_view(request, uidb64, token):
     user.save(update_fields=["password"])
     messages.success(request, "비밀번호가 재설정되었습니다. 로그인해주세요.")
     return redirect("accounts:login")
+
+# ====== 마이페이지 ======
+@login_required
+@require_http_methods(["GET", "POST"])
+def mypage_view(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        new_email = _norm_email(request.POST.get("email"))
+        new_uuid_raw = (request.POST.get("minecraft_uuid") or "").strip()
+        normalized_uuid = new_uuid_raw.replace("-", "")
+
+        updated_fields = []
+        has_error = False
+
+        if new_email and new_email != _norm_email(request.user.email):
+            if UserModel.objects.filter(email=new_email).exclude(pk=request.user.pk).exists():
+                messages.error(request, "이미 사용 중인 이메일입니다.")
+                has_error = True
+            else:
+                request.user.email = new_email
+                request.user.save(update_fields=["email"])
+                updated_fields.append("이메일")
+
+        if new_uuid_raw:
+            if len(normalized_uuid) != 32:
+                messages.error(request, "Minecraft UUID 형식이 올바르지 않습니다.")
+                has_error = True
+            elif UserProfile.objects.filter(minecraft_uuid__in=[new_uuid_raw, normalized_uuid]).exclude(pk=profile.pk).exists():
+                messages.error(request, "이미 사용 중인 Minecraft UUID입니다.")
+                has_error = True
+            else:
+                profile.minecraft_uuid = new_uuid_raw if len(new_uuid_raw) <= 36 else normalized_uuid
+                profile.save(update_fields=["minecraft_uuid"])
+                updated_fields.append("Minecraft UUID")
+        elif profile.minecraft_uuid:
+            profile.minecraft_uuid = ""
+            profile.save(update_fields=["minecraft_uuid"])
+            updated_fields.append("Minecraft UUID")
+
+        if not has_error:
+            if updated_fields:
+                messages.success(request, f"{', '.join(updated_fields)} 정보가 업데이트되었습니다.")
+            else:
+                messages.info(request, "변경된 내용이 없습니다.")
+
+        return redirect("accounts:mypage")
+
+    wiki_pages = []
+    try:
+        from wiki.models import WikiPage
+        wiki_pages = WikiPage.objects.filter(author=request.user).order_by('-created_at')[:10]
+    except ImportError:
+        pass
+
+    context = {
+        'profile': profile,
+        'wiki_pages': wiki_pages,
+    }
+
+    return render(request, "accounts/mypage.html", context)

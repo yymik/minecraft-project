@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load wiki_filters %}
+{% block title %}최근 변경 - 스티븐 위키{% endblock %}
+{% block content %}
+<h2>최근 변경</h2>
+<table border="1" cellspacing="0" cellpadding="6">
+  <tr><th>시간</th><th>문서</th><th>편집자</th><th>요약</th></tr>
+  {% for c in changes %}
+  <tr>
+    <td>{{ c.timestamp }}</td>
+    <td><a href="{% url 'wiki:wiki_detail' c.title|wiki_title_path %}">{{ c.title }}</a></td>
+    <td>{{ c.editor }}</td>
+    <td>{{ c.summary }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="4">표시할 변경 내역이 없습니다.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
+

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}토론 - 스티븐 위키{% endblock %}
+{% block content %}
+<h2>{{ topic.title }}</h2>
+{% if load_error %}
+<div class="alert alert-warning">{{ load_error }}</div>
+{% endif %}
+<div>
+  {% for c in comments %}
+    <div style="border:1px solid #ddd; padding:8px; margin-bottom:6px;">
+      <div><strong>{{ c.author }}</strong> <span style="color:#888;">{{ c.timestamp }}</span></div>
+      <div>{{ c.content|linebreaksbr }}</div>
+    </div>
+  {% empty %}
+    <p>댓글이 없습니다.</p>
+  {% endfor %}
+</div>
+
+<h3>댓글 작성</h3>
+<form method="POST">
+  {% csrf_token %}
+  <input type="text" name="author" placeholder="이름 (선택)" style="width:100%;"><br><br>
+  <textarea name="content" rows="5" style="width:100%;" placeholder="내용"></textarea><br>
+  <button type="submit">등록</button>
+  <a href="{% url 'wiki:recent_discussions' %}">목록</a>
+ </form>
+{% endblock %}
+

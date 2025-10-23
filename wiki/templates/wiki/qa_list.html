@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}질문 게시판 - 스티븐 위키{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h1 class="h3 mb-1"><i class="fas fa-question-circle me-2"></i>질문 게시판</h1>
+          <p class="text-muted mb-0">
+            궁금한 점은 무엇이든 물어보세요! 다른 사용자와 지식을 나누고, 해결 과정을 기록해두면 모두에게 도움이 됩니다.
+          </p>
+        </div>
+        <a href="{% url 'wiki:qa_new' %}" class="btn btn-primary">
+          <i class="fas fa-pencil-alt me-1"></i>질문 작성
+        </a>
+      </div>
+
+      {% if is_sample %}
+        <div class="alert alert-info">
+          현재는 예시 데이터가 표시되고 있습니다. 상단의 <strong>질문 작성</strong> 버튼을 눌러 첫 질문을 등록해보세요!
+        </div>
+      {% endif %}
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>제목</th>
+              <th style="width: 160px;">작성자</th>
+              <th style="width: 180px;">작성일</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for it in items %}
+            <tr>
+              <td>
+                <a href="{% url 'wiki:qa_detail' it.id %}" class="text-decoration-none">
+                  {{ it.title }}
+                </a>
+              </td>
+              <td>{{ it.author|default:"익명" }}</td>
+              <td>{{ it.created_at }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="text-center text-muted">등록된 질문이 없습니다. 첫 질문을 작성해보세요!</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4">
+        <h2 class="h5">이용 팁</h2>
+        <ul class="small text-muted">
+          <li>해당하는 카테고리나 문서를 함께 링크하면 답변자가 더 빠르게 문제를 파악할 수 있습니다.</li>
+          <li>답변을 받았다면 해결 결과를 댓글로 남겨서 다른 사용자에게도 도움이 되도록 해주세요.</li>
+          <li>규칙과 <a href="{% url 'wiki:wiki_detail' '규칙' %}">운영 정책</a>을 준수하며, 예의 바른 표현을 사용해주세요.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
