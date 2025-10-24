@@ -59,6 +59,7 @@
     <div class="container">
         <div class="header">
             <h1>인챈트 추천기: <span id="selectedItemNameDisplay">{{ selected_item_name }}</span></h1>
+            <a href="{% url 'enchant_recommender:main' %}" class="btn btn-outline-secondary btn-sm mt-2">← 인챈트 게시판으로</a>
         </div>
 
         {% if message %}

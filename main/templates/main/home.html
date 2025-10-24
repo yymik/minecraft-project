@@ -66,12 +66,54 @@
       background: #e5e5e5;
       border: 2px solid #bbb;
       padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .panel-section {
+      background: #ffffff;
+      border: 1px solid #c7c7c7;
+      border-radius: 6px;
+      box-shadow: inset 0 0 0 1px #f5f5f5;
+      padding: 14px;
     }
     .wiki-intro {
       background: white;
       border: 2px solid #bbb;
-      padding: 20px;
-      text-align: center;
+      padding: 22px;
+    }
+    .wiki-intro h4 {
+      font-weight: 700;
+      color: #1f4f82;
+      margin-bottom: 12px;
+    }
+    .wiki-intro p.lead {
+      font-size: 0.95rem;
+      color: #444;
+      margin-bottom: 16px;
+    }
+    .wiki-intro .wiki-section {
+      margin-bottom: 16px;
+    }
+    .wiki-intro .wiki-section h6 {
+      font-weight: 600;
+      color: #2f4f7f;
+      margin-bottom: 6px;
+    }
+    .wiki-intro ul {
+      list-style: disc;
+      padding-left: 22px;
+      margin-bottom: 0;
+    }
+    .wiki-intro ul li {
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      color: #333;
+    }
+    .wiki-intro .quick-links a {
+      text-decoration: none;
+      color: #0d6efd;
+      font-weight: 600;
     }
     .black-box {
       background: #dcdcdc;
@@ -84,12 +126,39 @@
       display: flex;
       justify-content: space-around;
       margin-top: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .category-btn {
+      position: relative;
+      padding-left: 42px;
+      min-width: 110px;
+      text-align: left;
+    }
+    .category-btn::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      background-size: cover;
+      image-rendering: pixelated;
+    }
+    .category-btn.btn-brewing::before {
+      background-image: url('data:image/svg+xml;base64,CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMzIgMzInPgogIDxyZWN0IHg9JzE0JyB5PSc0JyB3aWR0aD0nNCcgaGVpZ2h0PScxMicgZmlsbD0nI2Q3ZDdkNycvPgogIDxjaXJjbGUgY3g9JzE2JyBjeT0nMjAnIHI9JzYnIGZpbGw9JyM4YzVjM2QnLz4KICA8cmVjdCB4PScxMycgeT0nMTgnIHdpZHRoPSc2JyBoZWlnaHQ9JzEwJyBmaWxsPScjNDQ0NDQ0Jy8+CiAgPHJlY3QgeD0nMTInIHk9JzI3JyB3aWR0aD0nOCcgaGVpZ2h0PSczJyBmaWxsPScjMWYxZjFmJy8+CiAgPHJlY3QgeD0nOCcgeT0nNicgd2lkdGg9JzQnIGhlaWdodD0nNCcgZmlsbD0nIzljOWM5YycvPgogIDxyZWN0IHg9JzIwJyB5PSc2JyB3aWR0aD0nNCcgaGVpZ2h0PSc0JyBmaWxsPScjOWM5YzljJy8+Cjwvc3ZnPgo=');
+    }
+    .category-btn.btn-mobs::before {
+      background-image: url('data:image/svg+xml;base64,CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMzIgMzInPgogIDxyZWN0IHdpZHRoPSczMicgaGVpZ2h0PSczMicgZmlsbD0nIzU0YTkzOCcvPgogIDxyZWN0IHg9JzgnIHk9JzEwJyB3aWR0aD0nNicgaGVpZ2h0PSc2JyBmaWxsPScjMGY0YTFjJy8+CiAgPHJlY3QgeD0nMTgnIHk9JzEwJyB3aWR0aD0nNicgaGVpZ2h0PSc2JyBmaWxsPScjMGY0YTFjJy8+CiAgPHJlY3QgeD0nMTInIHk9JzIwJyB3aWR0aD0nOCcgaGVpZ2h0PSc0JyBmaWxsPScjMGY0YTFjJy8+Cjwvc3ZnPgo=');
+    }
+    .category-btn.btn-blocks::before {
+      background-image: url('data:image/svg+xml;base64,CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMzIgMzInPgogIDxyZWN0IHdpZHRoPSczMicgaGVpZ2h0PSczMicgZmlsbD0nIzdmN2Y3ZicvPgogIDxyZWN0IHg9JzQnIHk9JzQnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCcgZmlsbD0nI2E0YTRhNCcvPgogIDxyZWN0IHg9JzE4JyB5PSc2JyB3aWR0aD0nMTAnIGhlaWdodD0nOCcgZmlsbD0nIzVmNWY1ZicvPgogIDxyZWN0IHg9JzYnIHk9JzE4JyB3aWR0aD0nOCcgaGVpZ2h0PScxMCcgZmlsbD0nIzVjNWM1YycvPgogIDxyZWN0IHg9JzE4JyB5PScxOCcgd2lkdGg9JzgnIGhlaWdodD0nOCcgZmlsbD0nIzliOWI5YicvPgo8L3N2Zz4K');
     }
     .tool-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-top: 10px;
     }
     .chatbot-btn {
       position: fixed;
@@ -100,32 +169,63 @@
     .version-box {
       background: white;
       border: 2px solid #bbb;
-      margin-top: 30px;
+      margin-top: 28px;
       padding: 20px;
     }
-    .version-box h5 {
-      text-align: center;
-      font-weight: bold;
-      background: url('https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3a/Grass_Block_JE4_BE2.png') repeat-x center;
-      color: white;
-      padding: 10px;
-      background-size: auto 100%;
-    }
-    .version-row {
+    .version-header {
       display: flex;
-      justify-content: space-around;
-      text-align: center;
-      margin-top: 15px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
     }
-    .version-col {
-      flex: 1;
-      min-width: 150px;
-      padding: 10px;
+    .version-header h5 {
+      font-weight: 700;
+      color: #1f4f82;
+      margin: 0;
     }
-    .version-col img {
-      height: 22px;
-      margin: 2px;
+    .version-header span {
+      font-size: 0.82rem;
+      color: #6c757d;
+    }
+    .version-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+    }
+    .version-card {
+      border: 1px solid #d5d5d5;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #fefefe 0%, #f3f3f3 100%);
+      padding: 14px;
+      box-shadow: inset 0 0 0 1px #ffffff;
+    }
+    .version-card h6 {
+      font-weight: 600;
+      color: #2f4f7f;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .version-card h6 img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+    .version-meta {
+      font-size: 0.88rem;
+      margin-bottom: 8px;
+      color: #444;
+    }
+    .platform-tags span {
+      display: inline-block;
+      background: #e4ecfa;
+      color: #365d9c;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-right: 4px;
+      margin-bottom: 3px;
     }
   </style>
 </head>
@@ -188,18 +288,50 @@
   <!-- 중앙 대문 -->
   <div class="left-panel">
     <div class="wiki-intro">
+      <h4>스티븐 위키 한눈에 보기</h4>
+      <p class="lead">
+        스티븐 위키는 마인크래프트와 관련된 방대한 정보를 커뮤니티가 함께 정리하는 프로젝트입니다.
+        최신 패치 소식, 게임 메커니즘 분석, 플레이 팁까지 검증된 자료를 한곳에서 찾을 수 있도록 돕습니다.
+      </p>
+
+      <div class="wiki-section">
+        <h6>주요 섹션</h6>
+        <ul>
+          <li><strong>광물 & 자원</strong> – 채굴 루트와 효율적인 수급 방법을 정리합니다.</li>
+          <li><strong>아이템 & 장비</strong> – 전투/도구/방어구 인챈트와 운용법을 안내합니다.</li>
+          <li><strong>몹 & 보스</strong> – 패턴 분석과 공략 전략을 제공합니다.</li>
+          <li><strong>구조물 & 생물 군계</strong> – 탐험 루트와 건축 영감을 공유합니다.</li>
+          <li><strong>튜토리얼</strong> – 초보 설명서부터 자동화 고급 팁까지 단계별로 정리합니다.</li>
+        </ul>
+      </div>
+
+      <div class="wiki-section">
+        <h6>커뮤니티 참여 방법</h6>
+        <ul>
+          <li>계정을 생성하고 로그인하면 누구나 문서를 편집할 수 있습니다.</li>
+          <li>토론 탭에서 다른 플레이어와 의견을 나누며 문서 품질을 함께 개선합니다.</li>
+          <li>출처를 명확히 기재해 신뢰도 있는 정보를 유지해주세요.</li>
+        </ul>
+      </div>
+
+      <div class="wiki-section quick-links">
+        <h6>빠른 링크</h6>
+        <ul>
+          <li><a href="/wiki/업데이트 패치 노트 총람 #1/">업데이트 패치 노트 모음</a></li>
+          <li><a href="/wiki/기초 생존 가이드/">기초 생존 가이드</a></li>
+          <li><a href="/wiki/규칙/">규칙 및 편집 지침</a></li>
+          <li><a href="/wiki/토론/">커뮤니티 토론 광장</a></li>
+        </ul>
+      </div>
+
       {% if main_doc %}
-        <h5>
-          <a href="/wiki/{{ main_doc.title }}/" style="text-decoration: none; color: #006699; font-weight: bold;">
-            {{ main_doc.title }}
-          </a>
-        </h5>
-        <p>{{ main_doc.content|linebreaksbr }}</p>
-        <a href="/wiki/" class="btn btn-outline-primary btn-sm">대문</a>
+      <div class="mt-3">
+        <a href="/wiki/{{ main_doc.title }}/" class="btn btn-outline-primary btn-sm">대문 문서로 이동</a>
+      </div>
       {% else %}
-        <h5>대문 문서를 찾을 수 없습니다</h5>
-        <p>위키 메인 문서가 아직 작성되지 않았습니다.</p>
-        <a href="/wiki/" class="btn btn-outline-primary btn-sm">대문</a>
+      <div class="mt-3">
+        <a href="/wiki/" class="btn btn-outline-primary btn-sm">대문 문서 작성하기</a>
+      </div>
       {% endif %}
     </div>
 
@@ -209,66 +341,88 @@
     </div>
 
     <div class="category-buttons">
-      <a href="{% url 'wiki:wiki_category' 'trade' %}" class="btn btn-secondary">거래</a>
-      <a href="{% url 'wiki:wiki_category' 'brewing' %}" class="btn btn-secondary">양조</a>
-      <a href="{% url 'wiki:wiki_category' 'mobs' %}" class="btn btn-secondary">몹</a>
-      <a href="{% url 'wiki:wiki_category' 'blocks' %}" class="btn btn-secondary">블록</a>
-      <a href="{% url 'wiki:wiki_category' 'items' %}" class="btn btn-secondary">아이템</a>
+      <a href="{% url 'wiki:wiki_category' 'trade' %}" class="btn btn-secondary category-btn">거래</a>
+      <a href="{% url 'wiki:wiki_category' 'brewing' %}" class="btn btn-secondary category-btn btn-brewing">양조</a>
+      <a href="{% url 'wiki:wiki_category' 'mobs' %}" class="btn btn-secondary category-btn btn-mobs">몹</a>
+      <a href="{% url 'wiki:wiki_category' 'blocks' %}" class="btn btn-secondary category-btn btn-blocks">블록</a>
+      <a href="{% url 'wiki:wiki_category' 'items' %}" class="btn btn-secondary category-btn">아이템</a>
     </div>
 
-    <!-- 버전 정보 -->
-    <div class="version-box">
-      <h5>버전 종류</h5>
-      <div class="version-row">
-        <div class="version-col">
-          <strong>Java Edition</strong><br>
-          릴리스: <b>1.20.1</b><br>
-          개발 버전: 전투 테스트 8c<br>
-          런처: 2.4.69 (Win/Mac/Linux)
-        </div>
-        <div class="version-col">
-          <strong>Bedrock Edition</strong><br>
-          릴리스: <b>1.20.0</b><br>
-          개발 버전: 베타 1.20.10.21<br>
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Android_logo_2019.png" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Playstation_4_logo_and_wordmark.svg" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Xbox_logo_2012.svg" />
-        </div>
-        <div class="version-col">
-          <strong>Minecraft Education</strong><br>
-          릴리스: <b>1.19.52</b><br>
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Windows_logo_%E2%80%932012.svg" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Google_Chrome_icon_%282011%29.png" />
-        </div>
-        <div class="version-col">
-          <strong>Minecraft Dungeons</strong><br>
-          릴리스: <b>1.17.0.0</b><br>
-          <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Playstation_4_logo_and_wordmark.svg" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Xbox_logo_2012.svg" />
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- 우측 위키 도구 -->
   <div class="right-panel">
-    <h5 class="text-center">🧰 위키 도구</h5>
-    <div class="tool-grid">
-      <a href="/enchant-recommender/" class="btn btn-success">인챈트 시뮬레이터</a>
-      <a href="/potions/simulator/" class="btn btn-success">양조 시뮬레이터</a>
-      <a href="/save-analyzer/upload/" class="btn btn-success">도전과제 정보</a>
-      <a href="/wiki/recent-changes/" class="btn btn-success">최근 변경</a>
-      <a href="/chatbot/user-info/" class="btn btn-success">마크 유저 조회</a>
-      <a href="/skin-editor/" class="btn btn-success">스킨 생성/편집기</a>
+    <div class="panel-section">
+      <h5 class="text-center mb-3">🧰 위키 도구</h5>
+      <div class="tool-grid">
+        <a href="/enchant-recommender/" class="btn btn-success">인챈트 시뮬레이터</a>
+        <a href="/potions/simulator/" class="btn btn-success">양조 시뮬레이터</a>
+        <a href="/save-analyzer/upload/" class="btn btn-success">도전과제 정보</a>
+        <a href="/wiki/recent-changes/" class="btn btn-success">최근 변경</a>
+        <a href="/chatbot/user-info/" class="btn btn-success">마크 유저 조회</a>
+        <a href="/skin-editor/" class="btn btn-success">스킨 생성/편집기</a>
+      </div>
     </div>
 
-    <h6 class="mt-4">자주 찾는 문서</h6>
-    <ul class="small">
-      <li>○ <a href="{% url 'wiki:wiki_detail' '다이아몬드 광석 채굴 가이드' %}" class="text-decoration-none">다이아몬드 광석 채굴 가이드</a></li>
-      <li>○ <a href="{% url 'wiki:wiki_detail' '네더라이트 업그레이드 단계별 안내' %}" class="text-decoration-none">네더라이트 업그레이드 단계별 안내</a></li>
-      <li>○ <a href="{% url 'wiki:wiki_detail' '엔더 드래곤 전투 전략' %}" class="text-decoration-none">엔더 드래곤 전투 전략</a></li>
-    </ul>
+    <div class="panel-section">
+      <h6 class="mb-3">📚 자주 찾는 문서</h6>
+      <ul class="list-unstyled mb-0 small">
+        <li class="mb-2"><span class="badge bg-primary me-2">광물</span><a href="{% url 'wiki:wiki_detail' '다이아몬드 광석 채굴 가이드' %}" class="text-decoration-none">다이아몬드 광석 채굴 가이드</a></li>
+        <li class="mb-2"><span class="badge bg-success me-2">장비</span><a href="{% url 'wiki:wiki_detail' '네더라이트 업그레이드 단계별 안내' %}" class="text-decoration-none">네더라이트 업그레이드 단계별 안내</a></li>
+        <li class="mb-2"><span class="badge bg-warning text-dark me-2">보스</span><a href="{% url 'wiki:wiki_detail' '엔더 드래곤 전투 전략' %}" class="text-decoration-none">엔더 드래곤 전투 전략</a></li>
+        <li><span class="badge bg-info text-dark me-2">운영</span><a href="/wiki/레이드 운영 전략서" class="text-decoration-none">레이드 운영 전략서</a></li>
+      </ul>
+    </div>
+
+    <div class="panel-section version-box">
+      <div class="version-header">
+        <h5>버전 종류</h5>
+        <span>2025년 1월 기준 최신 정보</span>
+      </div>
+      <div class="version-grid">
+        <div class="version-card">
+          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6a/Grass_Block_JE4_BE2.png" alt="">Java Edition</h6>
+          <div class="version-meta">
+            <div><strong>릴리스</strong> : 1.20.1</div>
+            <div><strong>테스트</strong> : Combat Test 8c</div>
+            <div><strong>런처</strong> : 2.4.69</div>
+          </div>
+          <div class="platform-tags">
+            <span>Windows</span><span>macOS</span><span>Linux</span>
+          </div>
+        </div>
+        <div class="version-card">
+          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/8b/Grass_Block.png" alt="">Bedrock Edition</h6>
+          <div class="version-meta">
+            <div><strong>릴리스</strong> : 1.20.0</div>
+            <div><strong>베타</strong> : 1.20.10.21</div>
+          </div>
+          <div class="platform-tags">
+            <span>Xbox</span><span>PlayStation</span><span>Switch</span><span>Mobile</span>
+          </div>
+        </div>
+        <div class="version-card">
+          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/08/Education_Edition_logo.svg" alt="">Education Edition</h6>
+          <div class="version-meta">
+            <div><strong>릴리스</strong> : 1.19.52</div>
+            <div><strong>배포</strong> : EDU 포털</div>
+          </div>
+          <div class="platform-tags">
+            <span>Windows</span><span>macOS</span><span>iPadOS</span>
+          </div>
+        </div>
+        <div class="version-card">
+          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/83/Minecraft_Dungeons_logo.svg" alt="">Minecraft Dungeons</h6>
+          <div class="version-meta">
+            <div><strong>릴리스</strong> : 1.17.0.0</div>
+            <div><strong>DLC</strong> : Echoing Void 이후 패치 지속</div>
+          </div>
+          <div class="platform-tags">
+            <span>PC</span><span>Xbox</span><span>PlayStation</span><span>Switch</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
