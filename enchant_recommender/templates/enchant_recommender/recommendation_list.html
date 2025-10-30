@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>인챈트 추천 게시물 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load custom_filters %}
+    <style>
+        body { background: #f3f3f3; padding-top: 20px; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .post-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px; background: #fafafa; }
+        .post-title { font-size: 1.2em; font-weight: bold; color: #007bff; text-decoration: none; }
+        .post-info { font-size: 0.9em; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">📢 인챈트 추천 게시물 목록</h2>
+
+        <div class="mb-3 text-end">
+            <a href="{% url 'enchant_recommender:recommender' %}" class="btn btn-success">새 인챈트 추천 만들기</a>
+        </div>
+
+        {% if recommendations %}
+            {% for rec in recommendations %}
+                <div class="post-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="{% url 'enchant_recommender:detail' pk=rec.pk %}" class="post-title">{{ rec.title }}</a>
+                        <div class="post-info">
+                            {{ item_types|get_item:rec.item_type }} 추천 | 작성자: {{ rec.user.username }} | {{ rec.created_at|date:"Y.m.d H:i" }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="alert alert-warning">저장된 인챈트 추천 게시물이 없습니다.</p>
+        {% endif %}
+
+        <div class="mt-4">
+            <a href="{% url 'enchant_recommender:main' %}" class="btn btn-secondary">메인으로 돌아가기</a>
+        </div>
+    </div>
+</body>
+</html>

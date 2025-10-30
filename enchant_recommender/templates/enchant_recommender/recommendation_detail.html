@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ recommendation.user.username }} 님의 {{ item_type_name }} 추천 상세</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f3f3f3; }
+    .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 30px; }
+    .section-title { font-size: 1.25rem; font-weight: bold; margin-top: 20px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid #007bff; }
+    .enchant-list { list-style: none; padding-left: 0; }
+    .enchant-list li { display: flex; align-items: center; margin-bottom: 8px; }
+    .enchant-list li img { width: 24px; height: 24px; margin-right: 10px; }
+    .memo-box { border: 1px solid #ddd; border-radius: 5px; padding: 15px; background: #f9f9f9; margin-top: 20px; white-space: pre-wrap; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0">{{ recommendation.user.username }} 님의 {{ item_type_name }} 추천</h3>
+      <a href="{% url 'enchant_recommender:main' %}" class="btn btn-secondary btn-sm">목록으로 돌아가기</a>
+    </div>
+
+    <p class="text-muted">작성일: {{ recommendation.created_at|date:"Y년 m월 d일 H시 i분" }}</p>
+    <p><strong>좋아요 수:</strong> 👍 {{ recommendation.likes_count }}</p>
+
+    {# 추천 인챈트 #}
+    {% if recommended_enchants %}
+      <div class="section-title text-primary">추천 인챈트</div>
+      <ul class="enchant-list">
+        {% for enchant in recommended_enchants %}
+          <li>
+            <img src="{{ enchant.icon }}" alt="{{ enchant.name }}" class="enchant-icon">
+            <span>{{ enchant.name }}</span>
+            <small class="ms-2 text-muted">({{ enchant.description }})</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">추천 인챈트가 없습니다.</p>
+    {% endif %}
+
+    {# 일반 인챈트 #}
+    {% if general_enchants %}
+      <div class="section-title text-success">일반 인챈트</div>
+      <ul class="enchant-list">
+        {% for enchant in general_enchants %}
+          <li>
+            <img src="{{ enchant.icon }}" alt="{{ enchant.name }}" class="enchant-icon">
+            <span>{{ enchant.name }}</span>
+            <small class="ms-2 text-muted">({{ enchant.description }})</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">일반 인챈트가 없습니다.</p>
+    {% endif %}
+
+    {# 비추천 인챈트 #}
+    {% if not_recommended_enchants %}
+      <div class="section-title text-danger">비추천 인챈트</div>
+      <ul class="enchant-list">
+        {% for enchant in not_recommended_enchants %}
+          <li>
+            <img src="{{ enchant.icon }}" alt="{{ enchant.name }}" class="enchant-icon">
+            <span>{{ enchant.name }}</span>
+            <small class="ms-2 text-muted">({{ enchant.description }})</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">비추천 인챈트가 없습니다.</p>
+    {% endif %}
+
+    {# 메모 #}
+    {% if recommendation.memo %}
+      <div class="section-title">메모</div>
+      <div class="memo-box">
+        {{ recommendation.memo }}
+      </div>
+    {% else %}
+      <p class="text-muted">작성된 메모가 없습니다.</p>
+    {% endif %}
+
+    <div class="text-center mt-4">
+      <a href="{% url 'enchant_recommender:main' %}" class="btn btn-secondary">목록으로</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

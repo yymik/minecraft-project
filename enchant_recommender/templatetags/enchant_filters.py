@@ -11,3 +11,7 @@ def get_item(dictionary, key):
     if hasattr(dictionary, 'get'): # dictionary가 get 메소드를 가지고 있는지 확인 (더 안전)
         return dictionary.get(key)
     return None # get 메소드가 없거나 키가 없으면 None 반환
+
+@register.filter(name='in_list')
+def in_list(value, list_):
+    return value in list_

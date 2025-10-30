@@ -4,61 +4,124 @@
     <meta charset="UTF-8">
     <title>마인크래프트 인챈트 추천기</title>
     {% load static %}
-    {% load enchant_filters %} {# 새로 추가한 커스텀 필터 로드 #}
+    {% load custom_filters %}
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Minecraft', Arial, sans-serif; padding: 20px; background-color: #c6c6c6; color: #333; }
-        .container { max-width: 1200px; margin: auto; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { color: #FFF; background-color: #585858; padding: 10px; border: 2px solid #363636; box-shadow: inset 0 0 0 2px #a0a0a0; }
-        .controls { margin-bottom: 20px; padding: 15px; background-color: #8b8b8b; border: 2px solid #363636; box-shadow: inset 0 0 0 2px #a0a0a0; display: flex; gap: 10px; align-items: center; }
-        .controls label { font-weight: bold; color: #202020;}
-        .controls select, .controls button {
-            padding: 8px; font-family: inherit; font-size: 14px;
-            background-color: #c6c6c6; border: 2px solid #363636;
-            box-shadow: inset 0 0 0 2px #ffffff, 0 3px 0 #585858;
+        :root {
+            --mc-dark: #363636;
+            --mc-medium: #585858;
+            --mc-light: #c6c6c6;
+            --mc-white: #ffffff;
+            --mc-green: #6b996b;
         }
-        .controls button:active { box-shadow: inset 0 0 0 2px #ffffff, 0 1px 0 #585858; transform: translateY(2px); }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            padding: 20px;
+            background-color: var(--mc-light);
+            color: var(--mc-dark);
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: var(--mc-light);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--mc-medium);
+            border: 2px solid var(--mc-dark);
+            box-shadow: 4px 4px 0 var(--mc-dark);
+        }
+        .header h1 {
+            color: var(--mc-white);
+            font-size: 2em;
+            text-shadow: 2px 2px 0 var(--mc-dark);
+            margin: 0 0 10px 0;
+        }
+        /* 공통 버튼/입력 스타일 */
+        .mc-control, .mc-btn {
+            padding: 8px 15px; font-family: inherit; font-size: 14px;
+            background-color: var(--mc-light);
+            border: 2px solid var(--mc-dark);
+            box-shadow: inset 0 0 0 2px var(--mc-white), 0 3px 0 var(--mc-medium); /* 픽셀 그림자 효과 */
+            color: var(--mc-dark);
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .mc-btn:active {
+            box-shadow: inset 0 0 0 2px var(--mc-white), 0 1px 0 var(--mc-medium);
+            transform: translateY(2px);
+        }
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--mc-light);
+            border: 2px solid var(--mc-dark);
+            box-shadow: 4px 4px 0 var(--mc-medium);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .controls label { font-weight: bold; color: var(--mc-dark);}
 
-        .category-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;}
+        .save-form-panel {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--mc-medium);
+            border: 2px solid var(--mc-dark);
+            box-shadow: 4px 4px 0 var(--mc-dark);
+        }
+
+        .category-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
         .category-column {
-            min-height: 300px; /* 드래그 영역 확보 */
-            background-color: #8b8b8b; border: 2px solid #363636; padding: 10px;
-            box-shadow: inset 0 0 0 2px #a0a0a0;
+            min-height: 300px;
+            background-color: var(--mc-light);
+            border: 2px solid var(--mc-dark);
+            padding: 10px;
+            box-shadow: inset 0 0 0 2px var(--mc-medium);
         }
         .category-title {
-            text-align: center; font-weight: bold; margin-bottom: 10px; padding: 8px;
-            background-color: #585858; color: white; border: 2px solid #363636;
-            box-shadow: inset 0 0 0 2px #a0a0a0;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: var(--mc-dark);
+            color: var(--mc-white);
+            border: 2px solid var(--mc-medium);
         }
         .enchant-item {
-            background-color: #c6c6c6; border: 2px solid #363636; padding: 8px; margin-bottom: 8px;
-            display: flex; align-items: center; cursor: grab;
-            box-shadow: inset 0 0 0 2px #ffffff, 0 2px 0 #585858;
+            background-color: var(--mc-white);
+            border: 2px solid var(--mc-dark);
+            padding: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            cursor: grab;
+            box-shadow: 2px 2px 0 var(--mc-medium);
         }
-        .enchant-item img { width: 24px; height: 24px; margin-right: 8px; image-rendering: pixelated; }
-        .enchant-item .name { font-weight: bold; flex-grow: 1; color: #202020;}
         .enchant-item .actions button {
-            font-size: 10px; padding: 2px 4px; margin-left: 3px;
-            background-color: #a0a0a0; border: 1px solid #363636;
-            box-shadow: inset 0 0 0 1px #ffffff, 0 1px 0 #585858;
+            font-size: 10px;
+            padding: 2px 4px;
+            margin-left: 3px;
+            /* 버튼 스타일 오버라이드 */
+            background-color: var(--mc-light);
+            border: 1px solid var(--mc-dark);
+            box-shadow: inset 0 0 0 1px var(--mc-white), 0 1px 0 var(--mc-medium);
         }
-         .enchant-item .actions button:active { transform: translateY(1px); box-shadow: inset 0 0 0 1px #ffffff, 0 0px 0 #585858;}
-
-
-        .message-area { padding: 10px; margin-top:10px; text-align: center; border: 2px solid #363636; font-weight: bold; color:white; }
-        .message-area.info { background-color: #6b996b; }
-        .message-area.error { background-color: #c47171; }
-
-        /* For drag and drop later */
-        .dragging { opacity: 0.5; background-color: #e0e0e0; }
-        .drop-target-hover { background-color: #a0d0a0 !important; } /* 카테고리 컬럼 호버 효과 */
-
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>인챈트 추천기: <span id="selectedItemNameDisplay">{{ selected_item_name }}</span></h1>
+             <a href="{% url 'enchant_recommender:main' %}" class="mc-btn mt-2" style="background-color: #a0a0a0;">← 메인으로</a>
         </div>
 
         {% if message %}
@@ -67,26 +130,49 @@
             </div>
         {% endif %}
 
+       <form method="post" action="{% url 'enchant_recommender:recommender' %}" class="save-form-panel">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_recommendation">
+
+            <div style="margin-bottom: 10px;">
+                <label for="title_content" style="font-weight: bold; color: var(--mc-white);">게시물 제목:</label>
+                <input type="text" id="title_content" name="title_content" required
+                       style="width: 100%; padding: 5px; border: 1px solid var(--mc-dark);"
+                       placeholder="예: 최강 PVE 다이아몬드 검 인챈트" value="{{ temp_title }}">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label for="memo_content" style="font-weight: bold; color: var(--mc-white);">메모 (선택 사항):</label>
+                <textarea id="memo_content" name="memo_content" rows="3"
+                          style="width: 100%; padding: 5px; border: 1px solid var(--mc-dark);">{{ temp_memo }}</textarea>
+            </div>
+
+            <button type="submit" class="mc-btn" style="background-color: var(--mc-green);">
+                <i class="fas fa-save"></i> 추천 작성 완료 및 저장
+            </button>
+        </form>
+
         <div class="controls">
-            <form method="post" style="display:inline-flex; align-items:center; gap:10px;">
+            <form method="post" style="display:inline-flex; align-items:center; gap:10px; margin: 0;">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="select_item_type">
                 <label for="item_type_select">장비 선택:</label>
-                <select name="item_type" id="item_type_select" onchange="this.form.submit()">
+                <select name="item_type" id="item_type_select" onchange="this.form.submit()" class="mc-control">
                     {% for type_id, type_name in item_types.items %}
-                        <option value="{{ type_id }}" {% if selected_item_type == type_id %}selected{% endif %}>{{ type_name }}</option>
+                        <option value="{{ type_id }}" {% if selected_item_type == type_id %}selected{% endif %}>
+                            {{ type_name }}
+                        </option>
                     {% endfor %}
                 </select>
             </form>
-            <form method="post" style="margin-left: auto;">
+
+            <form method="post" action="{% url 'enchant_recommender:new_recommender' %}" style="margin-left: auto;">
                  {% csrf_token %}
-                <input type="hidden" name="action" value="reset_all">
-                <button type="submit">모든 분류 초기화</button>
+                <button type="submit" class="mc-btn" style="background-color: #d15151;">새 추천 시작 (전체 초기화)</button>
             </form>
         </div>
 
         <div class="category-columns">
-            <!-- 사용 가능한 인챈트 (현재 아이템에 적용 가능하고 아직 분류 안된 것) -->
             <div class="category-column available-enchants" id="available-column" data-category="available">
                 <div class="category-title">사용 가능한 인챈트</div>
                 {% for enchant_id, enchant_data in available_enchants.items %}
@@ -100,11 +186,10 @@
                         </div>
                     </div>
                 {% empty %}
-                    <p style="text-align:center; color:#505050;">적용 가능한 인챈트가 없거나 모두 분류되었습니다.</p>
+                    <p style="text-align:center; color:var(--mc-dark);">적용 가능한 인챈트가 없거나 모두 분류되었습니다.</p>
                 {% endfor %}
             </div>
 
-            <!-- 추천 인챈트 -->
             <div class="category-column recommended-enchants" id="recommended-column" data-category="recommended">
                 <div class="category-title">추천 인챈트 (S급)</div>
                 {% for enchant_id in recommended_enchants_ids %}
@@ -120,7 +205,6 @@
                 {% endfor %}
             </div>
 
-            <!-- 일반 인챈트 -->
             <div class="category-column general-enchants" id="general-column" data-category="general">
                 <div class="category-title">일반 인챈트 (A/B급)</div>
                 {% for enchant_id in general_enchants_ids %}
@@ -136,7 +220,6 @@
                 {% endfor %}
             </div>
 
-            <!-- 비추천 인챈트 -->
             <div class="category-column not-recommended-enchants" id="not-recommended-column" data-category="not_recommended">
                 <div class="category-title">비추천 인챈트 (C급/저주)</div>
                 {% for enchant_id in not_recommended_enchants_ids %}
@@ -154,15 +237,8 @@
         </div>
     </div>
 
-    {# 딕셔너리 키로 값을 가져오는 커스텀 템플릿 필터 로드 (필요시) #}
-    {# {% load custom_filters %} #}
-    {# `all_enchants_data|get_item:enchant_id`를 사용하기 위해 필요. 없다면 views.py에서 context 만들 때 직접 객체로 변환 #}
-    {# 만약 get_item 필터가 없다면, views.py에서 각 ID 리스트를 객체 리스트로 변환해서 전달해야 합니다. #}
-    {# 예: recommended_enchants = [ENCHANTMENTS[id] for id in recommended_enchants_ids] #}
-    {# 그리고 템플릿에서는 {% for enchant_data in recommended_enchants %} 로 사용 #}
-
     <script>
-        // 드래그 앤 드롭 JavaScript (기본 틀 - 실제 기능은 추가 구현 필요)
+        // 드래그 앤 드롭 JavaScript (기존 코드 유지)
         document.addEventListener('DOMContentLoaded', () => {
             const enchantItems = document.querySelectorAll('.enchant-item');
             const categoryColumns = document.querySelectorAll('.category-column');
@@ -172,7 +248,6 @@
                 item.addEventListener('dragstart', (e) => {
                     draggedItem = item;
                     setTimeout(() => item.classList.add('dragging'), 0);
-                    // e.dataTransfer.setData('text/plain', item.dataset.enchantId); // 데이터 전달 (필요시)
                 });
 
                 item.addEventListener('dragend', () => {
@@ -183,7 +258,7 @@
 
             categoryColumns.forEach(column => {
                 column.addEventListener('dragover', (e) => {
-                    e.preventDefault(); // 기본 동작 방지 (드롭 허용)
+                    e.preventDefault();
                     column.classList.add('drop-target-hover');
                 });
 
@@ -195,17 +270,16 @@
                     e.preventDefault();
                     column.classList.remove('drop-target-hover');
                     if (draggedItem) {
-                        // draggedItem을 이 column으로 옮기는 로직 (화면상)
-                        // column.appendChild(draggedItem); // 단순히 DOM 이동 (백엔드 연동 X)
-
-                        // 실제로는 form을 만들어서 submit 해야 함
                         const enchantId = draggedItem.dataset.enchantId;
                         const targetCategory = column.dataset.category;
 
-                        // 숨겨진 폼을 동적으로 만들어 제출
+                        // 💡 제목과 메모 값을 가져와서 함께 전송해야 값이 유지됨
+                        const titleContent = document.getElementById('title_content').value;
+                        const memoContent = document.getElementById('memo_content').value;
+
                         const form = document.createElement('form');
                         form.method = 'post';
-                        form.action = ''; // 현재 페이지로 POST
+                        form.action = '';
 
                         const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
 
@@ -214,6 +288,8 @@
                             <input type="hidden" name="action" value="move_enchant">
                             <input type="hidden" name="enchant_id" value="${enchantId}">
                             <input type="hidden" name="target_category" value="${targetCategory}">
+                            <input type="hidden" name="title_content" value="${titleContent}">
+                            <input type="hidden" name="memo_content" value="${memoContent}">
                         `;
                         document.body.appendChild(form);
                         form.submit();

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>📜 인챈트 게시물 메인</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  {# Google Fonts: 마인크래프트 폰트가 없으므로 가독성 좋은 noto sans kr을 사용하고, 디자인을 마크 스타일로 대체 #}
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+  {# 💡 커스텀 필터 로드 #}
+  {% load custom_filters %}
+
+  <style>
+    :root {
+      --mc-gray-dark: #363636;
+      --mc-gray-medium: #585858;
+      --mc-gray-light: #c6c6c6;
+      --mc-background: #f0f0f0;
+      --mc-border: #000;
+    }
+    body {
+      background-color: var(--mc-background);
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .container {
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    .main-box {
+      display: flex;
+      gap: 20px;
+    }
+
+    /* Minecraft 스타일 카드/패널 */
+    .mc-panel {
+      border: 2px solid var(--mc-border);
+      box-shadow: 4px 4px 0 var(--mc-gray-medium);
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: #fff; /* 흰색으로 설정하여 깔끔함 강조 */
+    }
+    .mc-header {
+      background-color: var(--mc-gray-medium);
+      color: white;
+      padding: 8px 15px;
+      border-bottom: 2px solid var(--mc-border);
+      margin: -15px -15px 15px -15px;
+      font-weight: bold;
+      text-shadow: 1px 1px 0 var(--mc-gray-dark);
+    }
+
+    /* 메뉴 패널 */
+    .left-panel { flex: 1; }
+
+    /* 게시물 목록 패널 */
+    .center-panel { flex: 2; }
+
+    /* 만들기 패널 */
+    .right-panel { flex: 1; }
+
+    .post-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--mc-gray-light);
+      transition: background-color 0.2s;
+    }
+    .post-item:hover {
+      background-color: #f7f7f7;
+    }
+    .post-title {
+      font-weight: 700;
+      font-size: 1.1em;
+      color: #0d6efd;
+      text-decoration: none;
+    }
+    .post-info {
+      font-size: 0.85em;
+      color: var(--mc-gray-medium);
+      margin-top: 4px;
+    }
+    .like-btn {
+      min-width: 50px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+    <div class="main-box">
+
+        <div class="left-panel">
+            <div class="mc-panel">
+                <div class="mc-header">메뉴</div>
+                <div class="d-grid gap-2">
+                    <a href="/" class="btn btn-secondary btn-sm">메인으로</a>
+                    <a href="{% url 'enchant_recommender:main' %}" class="btn btn-primary btn-sm">📜 인챈트 게시판</a>
+                    <a href="/potions/simulator/" class="btn btn-secondary btn-sm">🧪 양조 시뮬레이터</a>
+                    <a href="/wiki/challenge-info/" class="btn btn-secondary btn-sm">🏆 도전과제</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-panel">
+            <div class="mc-panel">
+                <div class="mc-header">📜 인챈트 추천 게시물</div>
+
+                {# Django messages 출력 #}
+                {% if messages %}
+                  {% for m in messages %}
+                    <div class="alert alert-{{ m.tags }} alert-dismissible fade show mb-3" role="alert">
+                      {{ m }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+
+                <div class="post-list">
+                    {% if posts %}
+                        {% for post in posts %}
+                            {# 좋아요 확인 로직 #}
+                            {% with is_liked=post.pk|in_list:liked_post_pks %}
+                            <div class="post-item">
+                                <div class="post-content">
+                                    {# 제목 출력 #}
+                                    <a href="{% url 'enchant_recommender:detail' pk=post.pk %}" class="post-title">
+                                        {{ post.title }}
+                                    </a>
+                                    <div class="post-info">
+                                        작성자: **{{ post.user.username }}** | {{ post.created_at|date:"Y.m.d H:i" }}
+                                    </div>
+                                </div>
+
+                                {# 좋아요 폼 #}
+                                <form method="post" action="{% url 'enchant_recommender:like_post' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="post_pk" value="{{ post.pk }}">
+                                    <button type="submit" class="btn btn-sm like-btn {% if is_liked %}btn-warning{% else %}btn-outline-warning{% endif %}"
+                                            {% if not user.is_authenticated %}disabled title="로그인 필요"{% endif %}>
+                                        <span style="font-size: 0.9em;">👍 {{ post.likes_count }}</span>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endwith %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted p-3 m-0">작성된 인챈트 추천 게시물이 없습니다. 지금 바로 만들어보세요!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="mc-panel text-center">
+                <div class="mc-header">✍️ 새로운 추천</div>
+                <p class="text-muted">나만의 최적 인챈트 조합을 공유해 보세요!</p>
+
+                <a href="{% url 'enchant_recommender:new_recommender' %}" class="btn btn-success mt-2 w-100">
+                    <i class="fas fa-magic"></i> 새 인챈트 시뮬레이터
+                </a>
+
+                <a href="{% url 'enchant_recommender:list' %}" class="btn btn-info btn-sm mt-3 w-100">
+                    전체 목록 보기
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
