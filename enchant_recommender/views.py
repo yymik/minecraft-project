@@ -177,6 +177,36 @@ def start_new_recommendation_view(request):
     return redirect('enchant_recommender:recommender')
 
 
+POST_LIST = [
+    {
+        "title": "검 전용 추천 조합 (1.20 기준)",
+        "likes": 14,
+        "author": "EnchanterLee",
+        "summary": "하드코어 기준으로 날카로움/약탈 조합을 정리했습니다.",
+    },
+    {
+        "title": "효율 + 행운 곡괭이 운용 팁",
+        "likes": 9,
+        "author": "MinerPark",
+        "summary": "동굴 탐험과 자동 광산 세팅을 위한 추천 인챈트입니다.",
+    },
+    {
+        "title": "밀치기 없이 PVP 하는 법",
+        "likes": 5,
+        "author": "PvPMaster",
+        "summary": "ELO 1800 이상 플레이어들이 즐겨 사용하는 칼 세팅을 공유합니다.",
+    },
+]
+
+
+def enchant_main_view(request):
+    """인챈트 시뮬레이터 게시판/허브 화면."""
+    context = {
+        "posts": POST_LIST,
+    }
+    return render(request, "enchant_recommender/enchant_main.html", context)
+
+
 def recommender_view(request):
     # GET 요청 시 초기화되거나 이전 값 불러오기
     recommended_enchants_ids = request.session.get('recommended_enchants_ids', [])
@@ -321,6 +351,9 @@ def recommender_view(request):
         'temp_title': temp_title,
         'temp_memo': temp_memo,
     }
+    # POST 후 redirect시 message가 있다면 세션에서 가져오고 삭제, 없다면 현재 message 사용
+    if request.method == "GET" and 'message' in request.session: # GET이고 세션에 메시지가 있으면
+        context['message'] = request.session.pop('message')
 
     return render(request, "enchant_recommender/recommender.html", context)
 
