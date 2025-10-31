@@ -17,7 +17,7 @@ urlpatterns = [
     path('qa/new/', views.qa_new, name='qa_new'),
     path('qa/<str:qid>/', views.qa_detail, name='qa_detail'),
     path('category/<slug:category_slug>/', views.wiki_category_overview, name='wiki_category'),
-    path('<str:title>/partial/', views.wiki_detail_partial, name='wiki_detail_partial'),
-    path('<str:title>/', views.wiki_detail_view, name='wiki_detail'),
-    path('<str:title>/edit/', views.wiki_edit_view, name='wiki_edit'),
+    path('<path:title>/partial/', views.wiki_detail_partial, name='wiki_detail_partial'),
+    path('<path:title>/edit/', views.wiki_edit_view, name='wiki_edit'),
+    path('<path:title>/', views.wiki_detail_view, name='wiki_detail'),
 ]

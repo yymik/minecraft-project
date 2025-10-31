@@ -3,7 +3,7 @@ from copy import deepcopy
 from django.shortcuts import render
 from django.utils import timezone
 from .dialogflow import get_dialogflow_response
-from .mojangApi import get_uuid_info
+from .mojangApi import get_uuid_info, get_skin_profile
 
 
 # 샘플 플레이어 데이터 (네트워크 불가 환경 대비)
@@ -11,21 +11,27 @@ SAMPLE_PLAYERS = {
     "steve": {
         "nickname": "Steve",
         "uuid": "8667ba71b85a4004af54457a9734eed7",
-        "skin_url": "https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/20/Steve_Render.png",
+        "skin_url": "https://crafatar.com/renders/body/8667ba71b85a4004af54457a9734eed7?overlay",
+        "skin_avatar_url": "https://crafatar.com/avatars/8667ba71b85a4004af54457a9734eed7?overlay",
+        "skin_texture_url": "https://textures.minecraft.net/texture/1a1b0b9d3eb6f7b0447d6b7ad16cf4123f8eb68075cc1652edc8c2f49038e430",
         "last_seen": "2025-01-10",
         "notes": "기본 남성 캐릭터 스킨",
     },
     "alex": {
         "nickname": "Alex",
         "uuid": "ec561538f3fd461daff5086b22154bce",
-        "skin_url": "https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/bd/Alex_render.png",
+        "skin_url": "https://crafatar.com/renders/body/ec561538f3fd461daff5086b22154bce?overlay",
+        "skin_avatar_url": "https://crafatar.com/avatars/ec561538f3fd461daff5086b22154bce?overlay",
+        "skin_texture_url": "https://textures.minecraft.net/texture/43474a9c3234225a0af2d15fe81f763b0e083189da3b087c032832b2c9442cc6",
         "last_seen": "2025-01-11",
         "notes": "기본 여성 캐릭터 스킨",
     },
     "notch": {
         "nickname": "Notch",
         "uuid": "069a79f444e94726a5befca90e38aaf5",
-        "skin_url": "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/18/Markus_Persson.png",
+        "skin_url": "https://crafatar.com/renders/body/069a79f444e94726a5befca90e38aaf5?overlay",
+        "skin_avatar_url": "https://crafatar.com/avatars/069a79f444e94726a5befca90e38aaf5?overlay",
+        "skin_texture_url": "https://textures.minecraft.net/texture/41ba1e8d2250b6246af2a3beea2981b61bf3eefec9e3ea364ab539766c7af8bd",
         "last_seen": "2024-12-25",
         "notes": "마인크래프트 창시자",
     },
@@ -82,14 +88,24 @@ def user_info_view(request):
                     "uuid": lookup.get("uuid"),
                     "source": "모장 공식 API",
                     "skin_url": None,
+                    "skin_texture_url": None,
+                    "skin_avatar_url": None,
                     "last_seen": timezone.now().date().isoformat(),
                     "notes": "외부 API에서 조회한 결과입니다.",
                 }
+                skin_profile = get_skin_profile(result["uuid"])
+                if skin_profile.get("skin_url"):
+                    result["skin_texture_url"] = skin_profile["skin_url"]
+                    result["skin_url"] = skin_profile.get("render_url") or skin_profile["skin_url"]
+                    result["skin_avatar_url"] = skin_profile.get("avatar_url")
+                elif skin_profile.get("error"):
+                    result["skin_error"] = skin_profile["error"]
             else:
                 sample = SAMPLE_PLAYERS.get(query.lower())
                 if sample:
                     result = deepcopy(sample)
                     result["source"] = "샘플 데이터"
+                    result.setdefault("skin_texture_url", result.get("skin_url"))
                 else:
                     error = lookup.get("error") if lookup else "플레이어 정보를 찾을 수 없습니다."
 

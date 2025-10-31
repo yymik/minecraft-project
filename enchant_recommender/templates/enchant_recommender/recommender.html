@@ -53,6 +53,56 @@
         .dragging { opacity: 0.5; background-color: #e0e0e0; }
         .drop-target-hover { background-color: #a0d0a0 !important; } /* 카테고리 컬럼 호버 효과 */
 
+        .save-panel {
+            margin-top: 24px;
+            padding: 20px;
+            background-color: #8b8b8b;
+            border: 2px solid #363636;
+            box-shadow: inset 0 0 0 2px #a0a0a0;
+        }
+        .save-panel label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #202020;
+        }
+        .save-panel input[type="text"],
+        .save-panel textarea {
+            width: 100%;
+            padding: 10px;
+            font-family: inherit;
+            border: 2px solid #363636;
+            background-color: #c6c6c6;
+            box-shadow: inset 0 0 0 2px #ffffff;
+            margin-bottom: 14px;
+        }
+        .save-panel textarea { min-height: 120px; resize: vertical; }
+        .save-panel .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .save-panel button {
+            padding: 10px 16px;
+            font-weight: bold;
+            background-color: #a0d0a0;
+            border: 2px solid #363636;
+            box-shadow: inset 0 0 0 2px #ffffff, 0 3px 0 #585858;
+        }
+        .save-panel button:active {
+            box-shadow: inset 0 0 0 2px #ffffff, 0 1px 0 #585858;
+            transform: translateY(2px);
+        }
+        .save-panel .auth-notice {
+            padding: 10px;
+            background-color: #c47171;
+            border: 2px solid #363636;
+            box-shadow: inset 0 0 0 2px #ffffff;
+            color: #fff;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
@@ -84,6 +134,26 @@
                  {% csrf_token %}
                 <input type="hidden" name="action" value="reset_all">
                 <button type="submit">모든 분류 초기화</button>
+            </form>
+        </div>
+
+        <div class="save-panel">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_recommendation">
+
+                <label for="title_input">추천 제목</label>
+                <input type="text" id="title_input" name="title_content" value="{{ temp_title }}" placeholder="예: 다이아 검 PvE 세팅" required>
+
+                <label for="memo_input">메모 / 세부 전략</label>
+                <textarea id="memo_input" name="memo_content" placeholder="추천 이유나 운용 팁을 적어주세요.">{{ temp_memo }}</textarea>
+
+                <div class="actions">
+                    <button type="submit" {% if not user.is_authenticated %}disabled{% endif %}>💾 추천 저장</button>
+                    {% if not user.is_authenticated %}
+                        <div class="auth-notice">로그인 후 저장할 수 있습니다.</div>
+                    {% endif %}
+                </div>
             </form>
         </div>
 
@@ -152,8 +222,9 @@
                     </div>
                     {% endwith %}
                 {% endfor %}
-            </div>
         </div>
+    </div>
+
     </div>
 
     {# 딕셔너리 키로 값을 가져오는 커스텀 템플릿 필터 로드 (필요시) #}

@@ -10,18 +10,50 @@
       background-color: #f3f3f3;
     }
     .top-bar {
-      background-color: #ffffff;
-      border-bottom: 2px solid black;
+      background: linear-gradient(180deg, #f9fbff 0%, #eef3fb 100%);
+      border-bottom: 1px solid #cdd6eb;
       padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .top-bar-left {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+  .top-bar-left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .site-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.25rem;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    letter-spacing: 0.5px;
+    transform: translateY(0);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .site-logo:hover {
+    text-decoration: none;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    transform: translateY(-1px);
+  }
+  .site-logo__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA2NCA2NCc+CjxyZWN0IHdpZHRoPSc2NCcgaGVpZ2h0PSc2NCcgZmlsbD0nIzVjOTEzYicvPgo8cmVjdCB4PSc4JyB5PScxNicgd2lkdGg9JzQ4JyBoZWlnaHQ9JzQwJyBmaWxsPScjYTY3NDQ5Jy8+CjxyZWN0IHg9JzgnIHk9JzQ0JyB3aWR0aD0nNDgnIGhlaWdodD0nMTInIGZpbGw9JyM4YjVhMzQnLz4KPHJlY3QgeD0nMTQnIHk9JzI2JyB3aWR0aD0nMTInIGhlaWdodD0nOCcgZmlsbD0nIzNhMjUxOCcvPgo8cmVjdCB4PSczOCcgeT0nMjYnIHdpZHRoPScxMicgaGVpZ2h0PSc4JyBmaWxsPScjM2EyNTE4Jy8+CjxyZWN0IHg9JzI2JyB5PSczOCcgd2lkdGg9JzEyJyBoZWlnaHQ9JzYnIGZpbGw9JyM2YzNmMWYnLz4KPHJlY3QgeD0nMjInIHk9JzMyJyB3aWR0aD0nOCcgaGVpZ2h0PSc0JyBmaWxsPScjZmZmZmZmJy8+CjxyZWN0IHg9JzM0JyB5PSczMicgd2lkdGg9JzgnIGhlaWdodD0nNCcgZmlsbD0nI2ZmZmZmZicvPgo8cmVjdCB4PScyNCcgeT0nMzInIHdpZHRoPSc0JyBoZWlnaHQ9JzQnIGZpbGw9JyMzYTI1MTgnLz4KPHJlY3QgeD0nMzYnIHk9JzMyJyB3aWR0aD0nNCcgaGVpZ2h0PSc0JyBmaWxsPScjM2EyNTE4Jy8+Cjwvc3ZnPg==') center/cover;
+    image-rendering: pixelated;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+  }
+  .site-logo__text {
+    font-size: 1.25rem;
+  }
     .top-bar-right {
       display: flex;
       align-items: center;
@@ -30,25 +62,66 @@
     }
     .cc-mark {
       font-size: 11px;
-      color: #888;
+      color: #6b7a99;
       position: absolute;
       top: 30px;
       right: 0;
     }
     .search-bar {
       margin: 20px auto 10px auto;
-      max-width: 600px;
+      max-width: 620px;
+    }
+    .search-bar .input-group {
+      border: 1px solid #d6deef;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(18, 36, 90, 0.08);
+    }
+    .search-bar .form-control {
+      border: none;
+      padding: 12px 18px;
+      font-size: 1rem;
+      background: transparent;
+    }
+    .search-bar .form-control:focus {
+      box-shadow: none;
+    }
+    .search-bar .btn-primary {
+      border-radius: 999px;
+      border: none;
+      padding: 0 22px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     }
     .tab-area {
-      background-color: #b3b3b3;
+      background: linear-gradient(90deg, rgba(226,233,247,0.85) 0%, rgba(240,243,252,0.95) 100%);
       padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
+      border: 1px solid rgba(173, 190, 230, 0.6);
+      border-radius: 10px;
+      margin: 0 20px;
     }
     .tab-left, .tab-right {
       display: flex;
       gap: 10px;
+    }
+    .tab-btn {
+      border-radius: 20px;
+      padding: 6px 16px;
+      border: 1px solid #5c7be1;
+      background: rgba(92,123,225,0.12);
+      color: #1d3f9a;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .tab-btn:hover {
+      background: linear-gradient(135deg, rgba(92,123,225,0.2) 0%, rgba(92,123,225,0.35) 100%);
+      color: #162c6d;
+      text-decoration: none;
     }
     .main-box {
       display: flex;
@@ -57,30 +130,34 @@
     }
     .left-panel {
       flex: 2;
-      background: #eee;
-      border: 2px solid #ccc;
-      padding: 15px;
+      background: #f8fbff;
+      border: 1px solid #d6deef;
+      padding: 18px;
+      border-radius: 10px;
     }
     .right-panel {
       flex: 1.2;
-      background: #e5e5e5;
-      border: 2px solid #bbb;
-      padding: 15px;
+      background: #f4f6fb;
+      border: 1px solid #ccd5ea;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      border-radius: 12px;
     }
     .panel-section {
       background: #ffffff;
-      border: 1px solid #c7c7c7;
-      border-radius: 6px;
-      box-shadow: inset 0 0 0 1px #f5f5f5;
-      padding: 14px;
+      border: 1px solid rgba(181,193,223,0.6);
+      border-radius: 10px;
+      box-shadow: 0 6px 14px rgba(31,53,114,0.08);
+      padding: 16px;
     }
     .wiki-intro {
       background: white;
-      border: 2px solid #bbb;
+      border: 1px solid #d6deef;
       padding: 22px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(18, 36, 90, 0.08);
     }
     .wiki-intro h4 {
       font-weight: 700;
@@ -116,24 +193,40 @@
       font-weight: 600;
     }
     .black-box {
-      background: #dcdcdc;
-      border: 2px solid #999;
-      padding: 10px;
+      background: linear-gradient(135deg, #e9effc 0%, #dde6f7 100%);
+      border: 1px solid #c5d3f1;
+      padding: 12px;
       margin-top: 20px;
       font-size: 14px;
+      border-radius: 10px;
+      color: #274188;
     }
     .category-buttons {
       display: flex;
       justify-content: space-around;
       margin-top: 20px;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
     }
     .category-btn {
       position: relative;
+      display: inline-flex;
+      align-items: center;
       padding-left: 42px;
-      min-width: 110px;
+      min-width: 120px;
       text-align: left;
+      border: 1px solid rgba(71, 126, 232, 0.45);
+      background: rgba(71, 126, 232, 0.12);
+      color: #26438f;
+      font-weight: 600;
+      border-radius: 10px;
+      text-decoration: none;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+    .category-btn:hover {
+      background: rgba(71, 126, 232, 0.22);
+      color: #1b2f72;
     }
     .category-btn::before {
       content: "";
@@ -155,10 +248,35 @@
     .category-btn.btn-blocks::before {
       background-image: url('data:image/svg+xml;base64,CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMzIgMzInPgogIDxyZWN0IHdpZHRoPSczMicgaGVpZ2h0PSczMicgZmlsbD0nIzdmN2Y3ZicvPgogIDxyZWN0IHg9JzQnIHk9JzQnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCcgZmlsbD0nI2E0YTRhNCcvPgogIDxyZWN0IHg9JzE4JyB5PSc2JyB3aWR0aD0nMTAnIGhlaWdodD0nOCcgZmlsbD0nIzVmNWY1ZicvPgogIDxyZWN0IHg9JzYnIHk9JzE4JyB3aWR0aD0nOCcgaGVpZ2h0PScxMCcgZmlsbD0nIzVjNWM1YycvPgogIDxyZWN0IHg9JzE4JyB5PScxOCcgd2lkdGg9JzgnIGhlaWdodD0nOCcgZmlsbD0nIzliOWI5YicvPgo8L3N2Zz4K');
     }
+    .category-btn.btn-trade::before {
+      background-image: url('data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMzIgMzIiPgogIDxnIGZpbGw9IiM0N2M1NzYiPgogICAgPHBhdGggZD0iTTkgMTBsNy05IDcgOS03IDIxLTctMjF6Ii8+CiAgICA8cGF0aCBkPSJNMTYgMTRsNS02IDUgNi01IDEyLTUtMTJ6Ii8+CiAgPC9nPgogIDxnIGZpbGw9IiMyOGI1NjMiPgogICAgPHBhdGggZD0iTTEzIDIxYTMgMyAwIDEgMSAzIDMgMyAzIDAgMCAxLTMtM3oiLz4KICAgIDxjaXJjbGUgY3g9IjE2IiBjeT0iMjUiIHI9IjMiLz4KICA8L2c+Cjwvc3ZnPg==');
+    }
+    .category-btn.btn-items::before {
+      background-image: url('data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMzIgMzIiPgogIDxnIGZpbGw9IiM5NDcwMzAiPgogICAgPHJlY3QgeD0iNSIgeT0iOSIgd2lkdGg9IjIyIiBoZWlnaHQ9IjE2IiByeD0iMiIgcnk9IjIiLz4KICAgIDxyZWN0IHg9IjciIHk9IjExIiB3aWR0aD0iMTgiIGhlaWdodD0iMTAiIGZpbGw9IiNkY2IxODQiLz4KICAgIDxyZWN0IHg9IjciIHk9IjE5IiB3aWR0aD0iMTgiIGhlaWdodD0iMiIgZmlsbD0iIzdhNTMwZCIvPgogICAgPHJlY3QgeD0iMTEiIHk9IjEzIiB3aWR0aD0iMTAiIGhlaWdodD0iNCIgZmlsbD0iI0Y2RjNEMCIvPgogICAgPHJlY3QgeD0iMTEiIHk9IjE3IiB3aWR0aD0iMTAiIGhlaWdodD0iMiIgZmlsbD0iI0M4OEM0RCIvPgogIDwvZz4KICA8cGF0aCBkPSJNMjQgNy42YTIgMiAwIDAgMC0xLjItMS44bC01LjYtMS45YTEgMSAwIDAgMC0uNiAwbC01LjYgMS45QTIgMiAwIDAgMCA5IDcuNlYxMGgyMFY3LjZ6IiBmaWxsPSIjYmQ4NDQwIi8+Cjwvc3ZnPg==');
+    }
     .tool-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+    }
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(66, 113, 219, 0.4);
+      background: linear-gradient(135deg, rgba(66,113,219,0.15) 0%, rgba(66,113,219,0.28) 100%);
+      color: #1d3f8e;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .tool-btn:hover {
+      background: linear-gradient(135deg, rgba(66,113,219,0.28) 0%, rgba(66,113,219,0.42) 100%);
+      color: #152c6b;
+      transform: translateY(-1px);
+      text-decoration: none;
     }
     .chatbot-btn {
       position: fixed;
@@ -168,9 +286,11 @@
     }
     .version-box {
       background: white;
-      border: 2px solid #bbb;
+      border: 1px solid #d6deef;
       margin-top: 28px;
-      padding: 20px;
+      padding: 22px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(18, 36, 90, 0.1);
     }
     .version-header {
       display: flex;
@@ -193,24 +313,41 @@
       gap: 14px;
     }
     .version-card {
-      border: 1px solid #d5d5d5;
-      border-radius: 6px;
-      background: linear-gradient(180deg, #fefefe 0%, #f3f3f3 100%);
+      border: 1px solid rgba(181,193,223,0.6);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fdfdff 0%, #f2f5fc 100%);
       padding: 14px;
-      box-shadow: inset 0 0 0 1px #ffffff;
+      box-shadow: 0 8px 18px rgba(29, 51, 112, 0.08);
     }
     .version-card h6 {
       font-weight: 600;
       color: #2f4f7f;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       margin-bottom: 8px;
     }
-    .version-card h6 img {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
+    .edition-icon {
+      display: inline-block;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      image-rendering: pixelated;
+      background-size: cover;
+      background-position: center;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+    }
+    .edition-icon.edition-java {
+      background-image: url('data:image/svg+xml;base64,Cjxzdmcgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iI2U2ZTYzZiIvPgogIDxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0iI2EyZDI3ZCIvPgogIDxyZWN0IHg9IjciIHk9IjciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjQiIGZpbGw9IiM2YWE5NjYiLz4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjEyIiByPSI0IiBmaWxsPSIjZjdmN2Y3Ii8+CiAgPHJlY3QgeD0iMTUiIHk9IjE4IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjM2E1N2MzIi8+Cjwvc3ZnPg==');
+    }
+    .edition-icon.edition-bedrock {
+      background-image: url('data:image/svg+xml;base64,Cjxzdmcgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzE5MWQyMSIvPgogIDxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0iIzMyMzUzNyIvPgogIDxyZWN0IHg9IjciIHk9IjciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxMSIgZmlsbD0iIzRkNDg1NCIvPgogIDxyZWN0IHg9IjciIHk9IjE4IiB3aWR0aD0iMTgiIGhlaWdodD0iNyIgZmlsbD0iIzFlMjAyMCIvPgogIDxyZWN0IHg9IjEzIiB5PSI5IiB3aWR0aD0iNiIgaGVpZ2h0PSI1IiBmaWxsPSIjZjdkOTQxIi8+Cjwvc3ZnPg==');
+    }
+    .edition-icon.edition-edu {
+      background-image: url('data:image/svg+xml;base64,Cjxzdmcgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJlZHVncmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM3OTkyZjIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMmE2M2U1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9InVybCgjZWR1Z3JhZCkiIHJ4PSI2Ii8+CiAgPHBhdGggZD0iTTEwIDI0TDggMjAuNXYtNi41TDE2IDEwTDI0IDE0di02LjVMNyA2djEyLjc0IiBmaWxsPSIjZmZjNDM5Ii8+CiAgPHJlY3QgeD0iMTEiIHk9IjEzIiB3aWR0aD0iMTAiIGhlaWdodD0iNCIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHg9IjExIiB5PSIxNyIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIxNSIgeT0iMjEiIHdpZHRoPSIyIiBoZWlnaHQ9IjQiIGZpbGw9IiM3OTkyZjIiLz4KPC9zdmc+');
+    }
+    .edition-icon.edition-dungeons {
+      background-image: url('data:image/svg+xml;base64,Cjxzdmcgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzIzMTIwMCIvPgogIDxnIGZpbGw9IiNmZmYiPgogICAgPHJlY3QgeD0iNyIgeT0iOSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjQiLz4KICAgIDxyZWN0IHg9IjEyIiB5PSIxMyIgd2lkdGg9IjgiIGhlaWdodD0iNCIvPgogICAgPHJlY3QgeD0iMTEiIHk9IjE3IiB3aWR0aD0iMTAiIGhlaWdodD0iNCIvPgogICAgPHJlY3QgeD0iMTQiIHk9IjIxIiB3aWR0aD0iNCIgaGVpZ2h0PSI0Ii8+CiAgPC9nPgogIDxyZWN0IHg9IjEzIiB5PSI0IiB3aWR0aD0iNiIgaGVpZ2h0PSI2IiByeD0iMyIgZmlsbD0iI2ZmZDI3MiIvPgo8L3N2Zz4=');
     }
     .version-meta {
       font-size: 0.88rem;
@@ -235,9 +372,10 @@
 <!-- home.html의 top-bar 부분 -->
 <div class="top-bar">
   <div class="top-bar-left">
-    <strong>스티븐 위키</strong>
-    <a href="/wiki/recent-changes/" class="btn btn-primary btn-sm">최근 변경</a>
-    <a href="/wiki/discussions/" class="btn btn-primary btn-sm">최근 토론</a>
+    <a href="/wiki/" class="site-logo">
+      <span class="site-logo__icon"></span>
+      <span class="site-logo__text">스티븐 위키</span>
+    </a>
   </div>
   <div class="top-bar-right">
     {% if user.is_authenticated %}
@@ -263,9 +401,9 @@
 <div class="search-bar text-center">
   <form method="GET" action="{% url 'wiki:wiki_search' %}">
     <div class="input-group">
-      <input type="text" class="form-control" name="q" placeholder="여기에 검색" required>
+      <input type="text" class="form-control" name="q" placeholder="마인크래프트 위키 검색" required>
       <button class="btn btn-primary" type="submit">
-        <i class="fas fa-search"></i> 검색
+        <i class="fas fa-search"></i> 검색하기
       </button>
     </div>
   </form>
@@ -274,12 +412,12 @@
 <!-- 탭 영역 -->
 <div class="tab-area">
   <div class="tab-left">
-    <a href="{% url 'main:discussion' %}" class="btn btn-info">토론</a>
-    <a href="{% url 'main:history' %}" class="btn btn-info">역사</a>
+    <a href="{% url 'main:discussion' %}" class="tab-btn">토론</a>
+    <a href="{% url 'main:history' %}" class="tab-btn">역사</a>
   </div>
   <div class="tab-right">
-    <a href="{% url 'main:notice' %}" class="btn btn-info">공지사항</a>
-    <a href="{% url 'main:tutorial' %}" class="btn btn-info">튜토리얼</a>
+    <a href="{% url 'main:notice' %}" class="tab-btn">공지사항</a>
+    <a href="{% url 'main:tutorial' %}" class="tab-btn">튜토리얼</a>
   </div>
 </div>
 
@@ -294,16 +432,7 @@
         최신 패치 소식, 게임 메커니즘 분석, 플레이 팁까지 검증된 자료를 한곳에서 찾을 수 있도록 돕습니다.
       </p>
 
-      <div class="wiki-section">
-        <h6>주요 섹션</h6>
-        <ul>
-          <li><strong>광물 & 자원</strong> – 채굴 루트와 효율적인 수급 방법을 정리합니다.</li>
-          <li><strong>아이템 & 장비</strong> – 전투/도구/방어구 인챈트와 운용법을 안내합니다.</li>
-          <li><strong>몹 & 보스</strong> – 패턴 분석과 공략 전략을 제공합니다.</li>
-          <li><strong>구조물 & 생물 군계</strong> – 탐험 루트와 건축 영감을 공유합니다.</li>
-          <li><strong>튜토리얼</strong> – 초보 설명서부터 자동화 고급 팁까지 단계별로 정리합니다.</li>
-        </ul>
-      </div>
+      <!-- 주요 섹션은 임시 비활성화 -->
 
       <div class="wiki-section">
         <h6>커뮤니티 참여 방법</h6>
@@ -341,11 +470,11 @@
     </div>
 
     <div class="category-buttons">
-      <a href="{% url 'wiki:wiki_category' 'trade' %}" class="btn btn-secondary category-btn">거래</a>
-      <a href="{% url 'wiki:wiki_category' 'brewing' %}" class="btn btn-secondary category-btn btn-brewing">양조</a>
-      <a href="{% url 'wiki:wiki_category' 'mobs' %}" class="btn btn-secondary category-btn btn-mobs">몹</a>
-      <a href="{% url 'wiki:wiki_category' 'blocks' %}" class="btn btn-secondary category-btn btn-blocks">블록</a>
-      <a href="{% url 'wiki:wiki_category' 'items' %}" class="btn btn-secondary category-btn">아이템</a>
+      <a href="{% url 'wiki:wiki_category' 'trade' %}" class="category-btn btn-trade">거래</a>
+      <a href="{% url 'wiki:wiki_category' 'brewing' %}" class="category-btn btn-brewing">양조</a>
+      <a href="{% url 'wiki:wiki_category' 'mobs' %}" class="category-btn btn-mobs">몹</a>
+      <a href="{% url 'wiki:wiki_category' 'blocks' %}" class="category-btn btn-blocks">블록</a>
+      <a href="{% url 'wiki:wiki_category' 'items' %}" class="category-btn btn-items">아이템</a>
     </div>
 
   </div>
@@ -355,12 +484,12 @@
     <div class="panel-section">
       <h5 class="text-center mb-3">🧰 위키 도구</h5>
       <div class="tool-grid">
-        <a href="/enchant-recommender/" class="btn btn-success">인챈트 시뮬레이터</a>
-        <a href="/potions/simulator/" class="btn btn-success">양조 시뮬레이터</a>
-        <a href="/save-analyzer/upload/" class="btn btn-success">도전과제 정보</a>
-        <a href="/wiki/recent-changes/" class="btn btn-success">최근 변경</a>
-        <a href="/chatbot/user-info/" class="btn btn-success">마크 유저 조회</a>
-        <a href="/skin-editor/" class="btn btn-success">스킨 생성/편집기</a>
+        <a href="/enchant-recommender/" class="tool-btn">인챈트 시뮬레이터</a>
+        <a href="/potions/simulator/" class="tool-btn">양조 시뮬레이터</a>
+        <a href="/save-analyzer/upload/" class="tool-btn">도전과제 정보</a>
+        <a href="/wiki/recent-changes/" class="tool-btn">최근 변경</a>
+        <a href="/chatbot/user-info/" class="tool-btn">마크 유저 조회</a>
+        <a href="/skin-editor/" class="tool-btn">스킨 생성/편집기</a>
       </div>
     </div>
 
@@ -381,7 +510,7 @@
       </div>
       <div class="version-grid">
         <div class="version-card">
-          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6a/Grass_Block_JE4_BE2.png" alt="">Java Edition</h6>
+          <h6><span class="edition-icon edition-java"></span>Java Edition</h6>
           <div class="version-meta">
             <div><strong>릴리스</strong> : 1.20.1</div>
             <div><strong>테스트</strong> : Combat Test 8c</div>
@@ -392,7 +521,7 @@
           </div>
         </div>
         <div class="version-card">
-          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/8b/Grass_Block.png" alt="">Bedrock Edition</h6>
+          <h6><span class="edition-icon edition-bedrock"></span>Bedrock Edition</h6>
           <div class="version-meta">
             <div><strong>릴리스</strong> : 1.20.0</div>
             <div><strong>베타</strong> : 1.20.10.21</div>
@@ -402,7 +531,7 @@
           </div>
         </div>
         <div class="version-card">
-          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/08/Education_Edition_logo.svg" alt="">Education Edition</h6>
+          <h6><span class="edition-icon edition-edu"></span>Education Edition</h6>
           <div class="version-meta">
             <div><strong>릴리스</strong> : 1.19.52</div>
             <div><strong>배포</strong> : EDU 포털</div>
@@ -412,7 +541,7 @@
           </div>
         </div>
         <div class="version-card">
-          <h6><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/83/Minecraft_Dungeons_logo.svg" alt="">Minecraft Dungeons</h6>
+          <h6><span class="edition-icon edition-dungeons"></span>Minecraft Dungeons</h6>
           <div class="version-meta">
             <div><strong>릴리스</strong> : 1.17.0.0</div>
             <div><strong>DLC</strong> : Echoing Void 이후 패치 지속</div>
@@ -427,22 +556,162 @@
 </div>
 
 <!-- 챗봇 오버레이 -->
-<div class="chatbot-btn">
-  <button class="btn btn-success" onclick="toggleChatbot()">챗봇 스티븐</button>
+<style>
+  .chatbot-launch {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9500;
+  }
+
+  .chatbot-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .chatbot-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 24px rgba(37, 99, 235, 0.28);
+  }
+
+  .chatbot-overlay {
+    position: fixed;
+    bottom: 110px;
+    right: 24px;
+    width: 360px;
+    max-width: calc(100vw - 40px);
+    height: 560px;
+    z-index: 9600;
+    display: none;
+  }
+
+  .chatbot-overlay.active {
+    display: block;
+  }
+
+  .chatbot-window {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+  }
+
+  .chatbot-window__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #fff;
+  }
+
+  .chatbot-window__title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chatbot-window__subtitle {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  .chatbot-close {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .chatbot-close:hover {
+    background: rgba(255,255,255,0.35);
+  }
+
+  .chatbot-frame {
+    border: none;
+    width: 100%;
+    flex: 1;
+    background: transparent;
+  }
+
+  @media (max-width: 576px) {
+    .chatbot-overlay {
+      right: 16px;
+      left: 16px;
+      bottom: 110px;
+      width: auto;
+      height: 70vh;
+    }
+
+    .chatbot-window {
+      border-radius: 16px;
+    }
+  }
+</style>
+
+<div class="chatbot-launch">
+  <button type="button" class="chatbot-toggle" onclick="toggleChatbot()">
+    <i class="bi bi-robot"></i> 챗봇 스티븐
+  </button>
 </div>
 
-<div id="chatbotOverlay" style="display:none; position:fixed; bottom:80px; right:20px; width:350px; height:500px; background:white; border:2px solid #888; z-index:10000; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
-  <div style="background:#28a745; color:white; padding:10px; font-weight:bold;">
-    챗봇 스티븐
-    <button style="float:right; background:none; border:none; color:white;" onclick="toggleChatbot()">X</button>
+<div id="chatbotOverlay" class="chatbot-overlay">
+  <div class="chatbot-window">
+    <div class="chatbot-window__header">
+      <div>
+        <p class="chatbot-window__title"><i class="bi bi-robot"></i> 챗봇 스티븐</p>
+        <p class="chatbot-window__subtitle">마인크래프트 전문 도우미</p>
+      </div>
+      <button type="button" class="chatbot-close" onclick="toggleChatbot(false)"><span aria-hidden="true">&times;</span></button>
+    </div>
+    <iframe id="chatbotFrame" class="chatbot-frame" data-src="/chatbot/chat/" title="스티븐 챗봇"></iframe>
   </div>
-  <iframe src="/chatbot/chat/" width="100%" height="90%" style="border:none;"></iframe>
 </div>
 
 <script>
-  function toggleChatbot() {
+  let chatbotLoaded = false;
+
+  function toggleChatbot(force) {
     const overlay = document.getElementById('chatbotOverlay');
-    overlay.style.display = overlay.style.display === 'none' ? 'block' : 'none';
+    const frame = document.getElementById('chatbotFrame');
+    const willOpen = force === undefined ? !overlay.classList.contains('active') : force;
+
+    if (willOpen) {
+      overlay.classList.add('active');
+      if (!chatbotLoaded && frame.dataset.src) {
+        frame.src = frame.dataset.src;
+        chatbotLoaded = true;
+      }
+    } else {
+      overlay.classList.remove('active');
+    }
   }
 </script>
 </body>

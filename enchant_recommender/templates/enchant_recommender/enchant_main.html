@@ -115,6 +115,12 @@
                   {% endfor %}
                 {% endif %}
 
+                {% if not allow_likes %}
+                    <div class="alert alert-info mb-3" role="alert">
+                        실제 게시물이 없어서 샘플 데이터를 보여주는 중입니다. 게시물을 등록하면 최신 글이 자동으로 나타납니다.
+                    </div>
+                {% endif %}
+
                 <div class="post-list">
                     {% if posts %}
                         {% for post in posts %}
@@ -136,7 +142,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="post_pk" value="{{ post.pk }}">
                                     <button type="submit" class="btn btn-sm like-btn {% if is_liked %}btn-warning{% else %}btn-outline-warning{% endif %}"
-                                            {% if not user.is_authenticated %}disabled title="로그인 필요"{% endif %}>
+                                            {% if not user.is_authenticated or not allow_likes %}disabled title="{% if not allow_likes %}샘플 데이터에서는 좋아요를 사용할 수 없습니다.{% else %}로그인 필요{% endif %}"{% endif %}>
                                         <span style="font-size: 0.9em;">👍 {{ post.likes_count }}</span>
                                     </button>
                                 </form>

@@ -51,7 +51,7 @@
 
             <!-- 문서 내용 -->
             <div class="wiki-content">
-                {{ content|wiki_links|markdown_to_html|safe }}
+                {{ page_html|safe }}
             </div>
 
             <!-- 편집 정보 -->
@@ -73,63 +73,20 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        {% for link in content|extract_links %}
-                        <li class="mb-2">
-                            <a href="{% url 'wiki:wiki_detail' link|wiki_title_path %}" class="text-decoration-none">
-                                <i class="fas fa-file-alt me-1"></i>{{ link }}
+                    {% if related_titles %}
+                        <div class="related-links">
+                            {% for link in related_titles %}
+                            <a href="{% url 'wiki:wiki_detail' link|wiki_title_path %}" class="related-link">
+                                {{ link }}
                             </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">연관된 문서를 아직 찾지 못했습니다.</p>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- 카테고리별 문서 -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-folder me-2"></i>{{ page.category|default:"기타" }} 카테고리
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <!-- 같은 카테고리의 다른 문서들 -->
-                        <li class="mb-2">
-                            <a href="#" class="text-decoration-none">
-                                <i class="fas fa-file-alt me-1"></i>관련 문서 1
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="#" class="text-decoration-none">
-                                <i class="fas fa-file-alt me-1"></i>관련 문서 2
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 빠른 링크 -->
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-bolt me-2"></i>빠른 링크
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'wiki:wiki_edit' title|wiki_title_path %}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-edit me-1"></i>편집하기
-                        </a>
-                        <a href="{% url 'wiki:recent_changes' %}" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-history me-1"></i>최근 변경
-                        </a>
-                        <a href="{% url 'wiki:wiki_main' %}" class="btn btn-outline-info btn-sm">
-                            <i class="fas fa-home me-1"></i>위키 메인
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -186,6 +143,222 @@
 
 .badge {
     font-size: 0.75em;
+}
+
+.wiki-content table.wiki-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    background: #fdfdfb;
+    border: 1px solid #d9e2d1;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wiki-content table.wiki-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #d9e2d1;
+    border-right: 1px solid #d9e2d1;
+    vertical-align: middle;
+}
+
+.wiki-content table.wiki-table tr:last-child td {
+    border-bottom: none;
+}
+
+.wiki-content table.wiki-table td:last-child {
+    border-right: none;
+}
+
+.wiki-content table.wiki-table td[colspan] {
+    text-align: center;
+    font-weight: 600;
+}
+
+.wiki-content .recipe-card {
+    background: #f9fafb;
+    border: 1px solid #d8e2d6;
+    border-radius: 12px;
+    padding: 1.4rem;
+    margin: 2rem 0;
+    box-shadow: 0 6px 16px rgba(17, 43, 24, 0.1);
+}
+
+.wiki-content .recipe-card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #2d4b2b;
+}
+
+.wiki-content .recipe-card__thumb {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.wiki-content .recipe-card__thumb img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.wiki-content .recipe-card__meta {
+    margin: 0 0 1.25rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3rem 0.75rem;
+    font-size: 0.95rem;
+}
+
+.wiki-content .recipe-card__meta dt {
+    font-weight: 600;
+    color: #385a33;
+}
+
+.wiki-content .recipe-card__meta dd {
+    margin: 0;
+    color: #2f2f2f;
+}
+
+.wiki-content .recipe-card__entry {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+}
+
+.wiki-content .recipe-card__entry:last-child {
+    margin-bottom: 0;
+}
+
+.wiki-content .recipe-card__entry-label {
+    min-width: 72px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #2d6e27;
+    padding-top: 0.75rem;
+}
+
+.wiki-content .recipe-card__entry-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wiki-content .recipe-step {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: #edf1f5;
+    border-radius: 10px;
+    padding: 0.9rem 1.15rem;
+    border: 1px solid #d6dce2;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wiki-content .recipe-step__board {
+    position: relative;
+    width: 180px;
+    flex-shrink: 0;
+}
+
+.wiki-content .recipe-step__board > img {
+    width: 100%;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.wiki-content .recipe-step__slot {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wiki-content .recipe-step__slot img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+.wiki-content .recipe-step__slot--input {
+    top: 0px;
+    left: 0px;
+}
+
+.wiki-content .recipe-step__slot--fuel {
+    bottom: 2px;
+    left: 0px;
+}
+
+.wiki-content .recipe-step__slot--output {
+    top: 35px;
+    right: 12px;
+}
+
+.wiki-content .recipe-step__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-left: auto;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.wiki-content .recipe-step__xp {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #259640;
+}
+
+.wiki-content .recipe-step__xp img {
+    width: 20px;
+    height: 20px;
+}
+
+.wiki-content .recipe-step__xp-value {
+    font-size: 1.15rem;
+}
+
+.wiki-content .recipe-step__time {
+    color: #3960d6;
+    font-size: 1.05rem;
+}
+
+.related-links {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 0.5rem;
+}
+
+.related-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d5d9e2;
+    border-radius: 6px;
+    background: #f7f9fc;
+    color: #1d2c4d;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.related-link:hover {
+    background: #e8eef9;
+    border-color: #9bb1d6;
 }
 </style>
 {% endblock %}

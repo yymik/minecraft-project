@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import re
 
 from django.contrib import messages
 from django.db import DatabaseError
@@ -8,11 +9,44 @@ from django.shortcuts import render, redirect, get_object_or_404
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError, ServerSelectionTimeoutError
 from datetime import datetime
+from urllib.parse import unquote
 from bson import ObjectId
 from bson.errors import InvalidId
 
+from markdown import markdown
+
 from .models import WikiPage
 from .seed import ensure_seed_pages
+from .opennamu_client import get_opennamu_client
+from .templatetags import wiki_filters
+
+
+#MARKDOWN -> HTML 변환
+# wiki/views.py
+from django.shortcuts import render, get_object_or_404
+from markdown import markdown
+from .models import WikiPage 
+
+def page_detail(request, slug):
+    page = get_object_or_404(WikiPage, slug=slug)
+    # 마크다운 → HTML (표/리스트 확장 포함)
+    page_html = markdown(page.content, extensions=['extra', 'tables', 'sane_lists'])
+    return render(request, 'wiki/page_detail.html', {
+        'page': page,
+        'page_html': page_html,
+    })
+
+def detail(request, slug):
+    page = get_object_or_404(WikiPage, slug=slug)
+
+    # ⬇︎ 마크다운 원문 필드 선택(프로젝트에 맞게 자동 선택)
+    raw = getattr(page, "content_md", None) or getattr(page, "content", None) or getattr(page, "body", "")
+    page_html = markdown(raw, extensions=['extra', 'tables', 'sane_lists'])
+
+    return render(request, 'wiki/detail.html', {
+        'page': page,
+        'page_html': page_html,
+    })
 
 
 CATEGORY_DEFINITIONS = {
@@ -91,6 +125,95 @@ SAMPLE_QUESTIONS = [
     },
 ]
 
+opennamu_client = get_opennamu_client()
+
+DEFAULT_RELATED = [
+    "건축 블록",
+    "색깔 블록",
+    "자연 블록",
+    "기능 블록",
+    "레드스톤 블록",
+    "전투",
+    "음식 및 음료",
+    "도구 및 유용한 물건",
+]
+
+
+def _override_display_title(raw_title: str) -> str:
+    if raw_title == "마인크래프트/아이템/재료":
+        return "아이템/재료"
+    return raw_title
+
+
+def _override_content_heading(content: str, original_title: str) -> str:
+    if not content or original_title != "마인크래프트/아이템/재료":
+        return content
+    return content.replace("# 마인크래프트/아이템/재료", "# 아이템/재료", 1)
+
+
+def _strip_edit_markers(content: str) -> str:
+    if not content:
+        return content
+    return re.sub(r"\s*\[편집\]", "", content)
+
+
+def _render_page_html(raw_content: str) -> str:
+    """Convert stored wiki markup into HTML once at the view layer."""
+    rendered = wiki_filters.wiki_links(raw_content or "")
+    return wiki_filters.markdown_to_html(rendered)
+
+
+def _dedupe_preserve_order(items):
+    seen = set()
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        yield item
+
+
+WIKILINK_PATTERN = re.compile(r"\[\[([^\]]+)\]\]")
+
+
+def _extract_wiki_titles(raw: str):
+    if not raw:
+        return []
+    titles = []
+    for match in WIKILINK_PATTERN.finditer(str(raw)):
+        candidate = match.group(1)
+        if not candidate:
+            continue
+        if "|" in candidate:
+            candidate = candidate.split("|", 1)[0]
+        candidate = candidate.split("#", 1)[0].strip()
+        if not candidate or candidate.startswith(("http", "#")):
+            continue
+        titles.append(candidate)
+    return list(_dedupe_preserve_order(titles))
+
+
+def _build_related_titles(raw_content: str, category: str, current_title: str):
+    if current_title == "마인크래프트/아이템/재료":
+        return DEFAULT_RELATED
+
+    candidates = _extract_wiki_titles(raw_content)
+    related = list(candidates[:8])
+
+    if len(related) >= 8:
+        return related
+
+    fallback_pool = DEFAULT_RELATED
+
+    for candidate in fallback_pool:
+        if candidate in related or candidate == current_title:
+            continue
+        related.append(candidate)
+        if len(related) >= 8:
+            break
+
+    return related
+
+
 def _serialize_question(doc, include_answers=False):
     if not doc:
         return None
@@ -126,11 +249,63 @@ except Exception:
 
 
 # MongoDB 기반 문서 보기
+def _decode_title(value: str) -> str:
+    """Return a human‑readable title decoded from the URL component."""
+    if not value:
+        return value
+    decoded = unquote(value)
+    return decoded or value
+
+
+def _title_candidates(raw_title: str):
+    """Yield possible title variants for lookups (decoded → raw)."""
+    decoded = _decode_title(raw_title)
+    if decoded:
+        yield decoded
+    if raw_title and raw_title != decoded:
+        yield raw_title
+
+
 def wiki_detail_view(request, title):
     ensure_seed_pages()
 
+    decoded_title = _decode_title(title)
+    title_candidates = list(_title_candidates(title))
+
+    if opennamu_client.enabled:
+        remote = opennamu_client.fetch_page(title)
+        if not remote and decoded_title != title:
+            remote = opennamu_client.fetch_page(decoded_title)
+        if remote:
+            meta = remote.get("metadata") if isinstance(remote.get("metadata"), dict) else {}
+            tags = meta.get("tags", [])
+            if not isinstance(tags, str):
+                tags = ",".join(tags) if isinstance(tags, (list, tuple)) else ""
+            page_stub = SimpleNamespace(
+                category=meta.get("category", "기타"),
+                view_count=meta.get("view_count", 0),
+                tags=tags,
+                author=meta.get("last_editor", "익명"),
+                updated_at=remote.get("updated_at", datetime.utcnow()),
+            )
+            remote_title = remote.get("title") or decoded_title or title
+            raw_content = remote.get("content", "")
+            content = _strip_edit_markers(_override_content_heading(raw_content, remote_title))
+            display_title = _override_display_title(remote_title)
+            return render(request, "wiki/detail.html", {
+                "title": display_title,
+                "content": content,
+                "page_html": _render_page_html(content),
+                "page": page_stub,
+                "related_titles": _build_related_titles(content, page_stub.category, remote_title),
+            })
+
     try:
-        page = WikiPage.objects.filter(title=title).first()
+        page = None
+        for candidate in title_candidates:
+            page = WikiPage.objects.filter(title=candidate).first()
+            if page:
+                break
     except DatabaseError:
         page = None
 
@@ -140,15 +315,22 @@ def wiki_detail_view(request, title):
             page.refresh_from_db(fields=["view_count", "updated_at"])
         except DatabaseError:
             pass
+        display_title = _override_display_title(page.title)
+        content = _strip_edit_markers(_override_content_heading(page.content, page.title))
         return render(request, "wiki/detail.html", {
-            "title": page.title,
-            "content": page.content,
+            "title": display_title,
+            "content": content,
+            "page_html": _render_page_html(content),
             "page": page,
+            "related_titles": _build_related_titles(content, page.category, page.title),
         })
 
     doc = None
     try:
-        doc = wiki.find_one({"title": title})
+        for candidate in title_candidates:
+            doc = wiki.find_one({"title": candidate})
+            if doc:
+                break
     except (PyMongoError, ServerSelectionTimeoutError):
         doc = None
 
@@ -163,13 +345,19 @@ def wiki_detail_view(request, title):
             author=doc.get("last_editor", "익명"),
             updated_at=doc.get("updated_at", datetime.utcnow()),
         )
+        resolved_title = doc.get("title") or decoded_title or title
+        raw_content = doc.get("content", "")
+        content = _strip_edit_markers(_override_content_heading(raw_content, resolved_title))
+        display_title = _override_display_title(resolved_title)
         return render(request, "wiki/detail.html", {
-            "title": doc.get("title", title),
-            "content": doc.get("content", ""),
+            "title": display_title,
+            "content": content,
+            "page_html": _render_page_html(content),
             "page": page_stub,
+            "related_titles": _build_related_titles(content, page_stub.category, resolved_title),
         })
 
-    return render(request, "wiki/not_found.html", {"title": title})
+    return render(request, "wiki/not_found.html", {"title": decoded_title or title})
 
 
 # 메인(네비게이션) 뷰
@@ -180,7 +368,31 @@ def wiki_main(request):
 
 # MongoDB 기반 문서 편집
 def wiki_edit_view(request, title):
-    doc = wiki.find_one({"title": title})
+    decoded_title = _decode_title(title)
+    title_candidates = list(_title_candidates(title))
+
+    if opennamu_client.enabled:
+        remote_doc = opennamu_client.fetch_page(title) or {}
+        if not remote_doc and decoded_title != title:
+            remote_doc = opennamu_client.fetch_page(decoded_title) or {}
+        if request.method == "POST":
+            new_content = request.POST.get("content", "")
+            summary = request.POST.get("summary", "")
+            success = opennamu_client.push_page(title, new_content, summary)
+            if success:
+                messages.success(request, "openNAMU 문서를 저장했습니다.")
+                return redirect("wiki:wiki_detail", title=title)
+            messages.error(request, "openNAMU 저장에 실패했습니다. 관리자에게 문의하세요.")
+        return render(request, "wiki/edit.html", {
+            "title": remote_doc.get("title") or decoded_title or title,
+            "content": remote_doc.get("content", ""),
+        })
+
+    doc = None
+    for candidate in title_candidates:
+        doc = wiki.find_one({"title": candidate})
+        if doc:
+            break
 
     if request.method == "POST":
         new_content = request.POST.get("content", "")
@@ -209,7 +421,7 @@ def wiki_edit_view(request, title):
         return redirect("wiki:wiki_detail", title=title)
 
     return render(request, "wiki/edit.html", {
-        "title": title,
+        "title": doc.get("title") if doc else decoded_title or title,
         "content": doc["content"] if doc else "",
     })
 
@@ -218,8 +430,15 @@ def wiki_edit_view(request, title):
 def wiki_detail_partial(request, title):
     ensure_seed_pages()
 
+    decoded_title = _decode_title(title)
+    title_candidates = list(_title_candidates(title))
+
     try:
-        page = WikiPage.objects.filter(title=title).first()
+        page = None
+        for candidate in title_candidates:
+            page = WikiPage.objects.filter(title=candidate).first()
+            if page:
+                break
     except DatabaseError:
         page = None
 
@@ -231,7 +450,10 @@ def wiki_detail_partial(request, title):
 
     doc = None
     try:
-        doc = wiki.find_one({"title": title})
+        for candidate in title_candidates:
+            doc = wiki.find_one({"title": candidate})
+            if doc:
+                break
     except (PyMongoError, ServerSelectionTimeoutError):
         doc = None
 
@@ -613,18 +835,3 @@ def qa_new(request):
             return redirect("wiki:qa_detail", qid=str(res.inserted_id))
     return render(request, "wiki/qa_new.html")
 
-
-# (선택) Django ORM 기반 문서 뷰 - 예전 호환용
-def view_page(request, title):
-    page = get_object_or_404(WikiPage, title=title)
-    return render(request, 'wiki/view.html', {'page': page})
-
-
-# (선택) Django ORM 기반 문서 편집
-def edit_page(request, title):
-    page, _ = WikiPage.objects.get_or_create(title=title)
-    if request.method == 'POST':
-        page.content = request.POST.get('content', '')
-        page.save()
-        return redirect('wiki:view', title=title)
-    return render(request, 'wiki/edit.html', {'page': page})

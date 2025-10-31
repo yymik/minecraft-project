@@ -1,8 +1,12 @@
-
 from pathlib import Path
+from datetime import timedelta
 
 # BASE_DIR: 프로젝트 최상위 경로
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+#WIKI 이미지 서빙 설정
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # 보안 관련 설정
 SECRET_KEY = 'django-insecure-*@3*4nz0i6-5&0cz25eg6s7d6nq@m^1tpue3@ek7)%t@gqf-+u'
@@ -23,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'accounts',
     'chatbot',
     'main',
@@ -110,3 +115,45 @@ EMAIL_HOST_PASSWORD = 'hffl kpkf nfh rcisc'     # 🚨 실제 본인의 Gmail �
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SITE_URL = "http://localhost:8000"  # 배포 시 실제 도메인으로
+
+OPENNAMU = {
+    "ENABLED": False,
+    "BASE_URL": "http://localhost:3001",
+    "API_TOKEN": "",
+    "ENDPOINTS": {
+        "GET_PAGE": "/api/document/{title}",
+        "PUT_PAGE": "/api/document/{title}",
+    },
+}
+
+DIALOGFLOW = {
+    "ENABLED": False,
+    "PROJECT_ID": "",
+    "LANGUAGE_CODE": "ko",
+    "SESSION_PREFIX": "mcwiki",
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+

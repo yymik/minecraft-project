@@ -1,5 +1,4 @@
 {% load wiki_filters %}
 <h2>{{ title }}</h2>
 <div>{{ content|autolink_wiki|linebreaksbr|safe }}</div>
-<p><a href="{% url 'wiki:wiki_edit' title|wiki_title_path %}">[편집]</a></p>
 

@@ -42,21 +42,61 @@
       {% if result %}
       <div class="card mb-4">
         <div class="card-body">
-          <div class="d-flex align-items-center mb-3">
-            {% if result.skin_url %}
-              <img src="{{ result.skin_url }}"
-                   alt="{{ result.nickname }} 스킨"
-                   class="rounded me-3"
-                   style="width:72px; height:72px; object-fit:cover;">
-            {% endif %}
-            <div>
-              <h3 class="h5 mb-1">{{ result.nickname }}</h3>
-              <span class="badge bg-secondary">{{ result.source }}</span>
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+            <div class="d-flex align-items-center">
+              {% if result.skin_avatar_url %}
+                <a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener"
+                   class="d-inline-flex align-items-center text-decoration-none">
+                  <img src="{{ result.skin_avatar_url }}"
+                       alt="{{ result.nickname }} 아바타"
+                       class="rounded-circle border me-3"
+                       style="width:72px; height:72px; image-rendering:pixelated;">
+                </a>
+              {% elif result.skin_url %}
+                <img src="{{ result.skin_url }}"
+                     alt="{{ result.nickname }} 스킨"
+                     class="rounded-circle border me-3"
+                     style="width:72px; height:72px; object-fit:cover;">
+              {% endif %}
+              <div>
+                <h3 class="h5 mb-1">{{ result.nickname }}</h3>
+                <span class="badge bg-secondary">{{ result.source }}</span>
+              </div>
             </div>
+            {% if result.skin_avatar_url %}
+              <a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener"
+                 class="btn btn-outline-secondary btn-sm d-flex align-items-center">
+                <img src="{{ result.skin_avatar_url }}"
+                     alt="{{ result.nickname }} 아바타"
+                     class="rounded-circle border me-2"
+                     style="width:32px; height:32px; image-rendering:pixelated;">
+                아바타 보기
+              </a>
+            {% endif %}
           </div>
+          {% if result.skin_url %}
+          <div class="text-center mb-3">
+            <img src="{{ result.skin_url }}"
+                 alt="{{ result.nickname }} 전체 스킨"
+                 class="img-fluid"
+                 style="max-width:220px; image-rendering:pixelated;">
+          </div>
+          {% endif %}
           <dl class="row mb-0">
             <dt class="col-sm-3">UUID</dt>
             <dd class="col-sm-9"><code>{{ result.uuid }}</code></dd>
+            {% if result.skin_texture_url %}
+            <dt class="col-sm-3">스킨 텍스처</dt>
+            <dd class="col-sm-9">
+              <a href="{{ result.skin_texture_url }}" target="_blank" rel="noopener">텍스처 다운로드</a>
+              {% if result.skin_avatar_url %}
+                <span class="text-muted ms-2"><a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener">아바타 보기</a></span>
+              {% endif %}
+            </dd>
+            {% elif result.skin_error %}
+            <dt class="col-sm-3">스킨 정보</dt>
+            <dd class="col-sm-9 text-muted">{{ result.skin_error }}</dd>
+            {% endif %}
             {% if result.last_seen %}
             <dt class="col-sm-3">최근 확인</dt>
             <dd class="col-sm-9">{{ result.last_seen }}</dd>
@@ -93,12 +133,27 @@
             <div class="col-md-4">
               <div class="border rounded p-3 h-100">
                 <h5>{{ player.nickname }}</h5>
+                {% if player.skin_avatar_url %}
+                  <img src="{{ player.skin_avatar_url }}"
+                       alt="{{ player.nickname }} 아바타"
+                       class="rounded-circle border mb-2"
+                       style="width:60px; height:60px; image-rendering:pixelated;">
+                {% endif %}
+                {% if player.skin_url %}
+                  <img src="{{ player.skin_url }}"
+                       alt="{{ player.nickname }} 스킨"
+                       class="img-fluid rounded mb-2"
+                       style="max-height:160px; image-rendering:pixelated;">
+                {% endif %}
                 <p class="small text-muted mb-1">UUID</p>
                 <code class="d-block mb-2 text-break">{{ player.uuid }}</code>
+                {% if player.skin_texture_url %}
+                  <a href="{{ player.skin_texture_url }}" target="_blank" rel="noopener" class="small">텍스처 보기</a>
+                {% endif %}
                 <p class="small text-muted mb-0">{{ player.notes }}</p>
               </div>
             </div>
-            {% endfor %}
+          {% endfor %}
           </div>
         </div>
       </div>

@@ -92,8 +92,8 @@
     
     .composer { 
       display: flex; 
-      gap: 10px; 
-      padding: 14px 16px; 
+      gap: 8px; 
+      padding: 12px 14px; 
       background: white; 
       border-top: 1px solid #e9ecef;
       align-items: center;
@@ -101,16 +101,19 @@
     
     .composer input { 
       flex: 1; 
-      padding: 12px 16px; 
-      border: 2px solid #e9ecef; 
-      border-radius: 25px; 
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
+      padding: 10px 14px; 
+      border: 1px solid #d8dee6; 
+      border-radius: 22px; 
+      font-size: 0.95rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      background: #f8fafc;
     }
     
     .composer input:focus {
       outline: none;
-      border-color: #3498db;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      background: #fff;
     }
     
     .composer button { 
@@ -118,7 +121,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 12px 20px; 
+      padding: 10px 16px; 
       border: none; 
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white; 
@@ -126,17 +129,17 @@
       cursor: pointer;
       font-weight: 600;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      min-width: 110px;
-      box-shadow: 0 6px 16px rgba(30, 64, 175, 0.25);
+      min-width: 96px;
+      box-shadow: 0 4px 14px rgba(30, 64, 175, 0.25);
     }
     
     .composer button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(30, 64, 175, 0.25);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(30, 64, 175, 0.3);
     }
 
     .composer button i {
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
     
     .welcome-message {
@@ -240,8 +243,41 @@
       }
 
       .composer {
-        padding: 16px 24px;
+        padding: 16px 20px;
+        gap: 12px;
       }
+    }
+
+    body.embedded {
+      background: transparent;
+      display: block;
+      height: 100%;
+    }
+
+    body.embedded .chat-container {
+      max-width: none;
+      height: 100%;
+      border-radius: 16px;
+      box-shadow: none;
+      border: 1px solid #d1d5db;
+    }
+
+    body.embedded .chat-header {
+      display: none;
+    }
+
+    body.embedded .chat-area {
+      padding: 16px;
+      background: #f8fafc;
+    }
+
+    body.embedded .composer {
+      border-radius: 0 0 16px 16px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    body.embedded .welcome-message {
+      padding-top: 12px;
     }
   </style>
 </head>
@@ -312,6 +348,10 @@
   </div>
 
   <script>
+    if (window.self !== window.top) {
+      document.body.classList.add('embedded');
+    }
+
     const chat = document.getElementById('chat');
     const form = document.getElementById('form');
     const input = document.getElementById('input');

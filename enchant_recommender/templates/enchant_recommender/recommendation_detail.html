@@ -22,6 +22,12 @@
       <a href="{% url 'enchant_recommender:main' %}" class="btn btn-secondary btn-sm">목록으로 돌아가기</a>
     </div>
 
+    {% if is_sample %}
+      <div class="alert alert-info" role="alert">
+        샘플 데이터를 보고 있습니다. 실제 게시물을 저장하면 상세 정보가 자동으로 갱신됩니다.
+      </div>
+    {% endif %}
+
     <p class="text-muted">작성일: {{ recommendation.created_at|date:"Y년 m월 d일 H시 i분" }}</p>
     <p><strong>좋아요 수:</strong> 👍 {{ recommendation.likes_count }}</p>
 

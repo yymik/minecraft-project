@@ -21,6 +21,12 @@
             <a href="{% url 'enchant_recommender:recommender' %}" class="btn btn-success">새 인챈트 추천 만들기</a>
         </div>
 
+        {% if is_sample %}
+            <div class="alert alert-info" role="alert">
+                아직 저장된 게시물이 없어 샘플 데이터를 보여주는 중입니다. 추천을 저장하면 실제 목록이 표시됩니다.
+            </div>
+        {% endif %}
+
         {% if recommendations %}
             {% for rec in recommendations %}
                 <div class="post-item d-flex justify-content-between align-items-center">
