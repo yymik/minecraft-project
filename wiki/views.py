@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError, ServerSelectionTimeoutError
 from datetime import datetime
+from django.utils import timezone
 from urllib.parse import unquote
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -253,17 +254,43 @@ def _decode_title(value: str) -> str:
     """Return a human‑readable title decoded from the URL component."""
     if not value:
         return value
-    decoded = unquote(value)
+    decoded = value
+    # Some clients send titles double-encoded (%25EC...); decode until stable (max 2 passes).
+    for _ in range(2):
+        new_val = unquote(decoded)
+        if new_val == decoded:
+            break
+        decoded = new_val
     return decoded or value
 
 
 def _title_candidates(raw_title: str):
     """Yield possible title variants for lookups (decoded → raw)."""
     decoded = _decode_title(raw_title)
-    if decoded:
-        yield decoded
+    seen = set()
+
+    def add(val):
+        if val and val not in seen:
+            seen.add(val)
+            yield val
+
+    # 기본값
+    for v in add(decoded):
+        yield v
     if raw_title and raw_title != decoded:
-        yield raw_title
+        for v in add(raw_title):
+            yield v
+
+    # "마인크래프트/" 접두/접미 변환
+    prefix = "마인크래프트/"
+    if decoded:
+        if not decoded.startswith(prefix):
+            for v in add(prefix + decoded):
+                yield v
+        else:
+            stripped = decoded[len(prefix):]
+            for v in add(stripped):
+                yield v
 
 
 def wiki_detail_view(request, title):
@@ -368,8 +395,38 @@ def wiki_main(request):
 
 # MongoDB 기반 문서 편집
 def wiki_edit_view(request, title):
+    ensure_seed_pages()
     decoded_title = _decode_title(title)
     title_candidates = list(_title_candidates(title))
+
+    # 1) DB 기반 위키 문서 우선 처리
+    page_db = None
+    try:
+        for candidate in title_candidates:
+            page_db = WikiPage.objects.filter(title=candidate).first()
+            if page_db:
+                break
+    except DatabaseError:
+        page_db = None
+
+    if request.method == "POST" and page_db:
+        new_content = request.POST.get("content", "")
+        summary = request.POST.get("summary", "") or page_db.summary
+        page_db.content = new_content
+        page_db.summary = summary
+        page_db.updated_at = timezone.now()
+        try:
+            page_db.save(update_fields=["content", "summary", "updated_at"])
+            messages.success(request, "문서를 저장했습니다.")
+        except DatabaseError:
+            messages.error(request, "저장 중 오류가 발생했습니다.")
+        return redirect("wiki:wiki_detail", title=page_db.title)
+
+    if page_db:
+        return render(request, "wiki/edit.html", {
+            "title": page_db.title,
+            "content": page_db.content,
+        })
 
     if opennamu_client.enabled:
         remote_doc = opennamu_client.fetch_page(title) or {}
@@ -834,4 +891,3 @@ def qa_new(request):
             })
             return redirect("wiki:qa_detail", qid=str(res.inserted_id))
     return render(request, "wiki/qa_new.html")
-

@@ -8,65 +8,88 @@
     <link rel="stylesheet" href="{% static 'skin_editor/css/style.css' %}">
 </head>
 <body>
-    <header>
-        <h1>마인크래프트 스킨 편집기</h1>
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Minecraft Skin Lab</p>
+            <h1>마인크래프트 스킨 편집기</h1>
+            <p class="lede">64x64 픽셀을 편하게 수정하고 바로 3D에서 확인하세요.</p>
+        </div>
+        <div class="header-actions">
+            <button id="downloadButton" type="button" class="btn primary">PNG로 다운로드</button>
+        </div>
     </header>
 
-    <main>
+    <main class="layout">
         <section class="controls">
-            <h2>컨트롤</h2>
-            <div class="control-group">
-                <label for="usernameInput">플레이어 이름으로 스킨 불러오기12:</label>
-                <input type="text" id="usernameInput" placeholder="Minecraft Username">
-                <button id="loadSkinButton" type="button">스킨 불러오기</button>
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <p class="eyebrow">불러오기</p>
+                        <h2>플레이어 스킨 가져오기</h2>
+                    </div>
+                </div>
+                <label for="usernameInput">플레이어 이름</label>
+                <div class="input-row">
+                    <input type="text" id="usernameInput" placeholder="Minecraft Username">
+                    <button id="loadSkinButton" type="button" class="btn ghost">불러오기</button>
+                </div>
+                <div class="inline-actions">
+                    <button id="resetButton" type="button" class="btn subtle">기본 스킨</button>
+                    <button id="clearButton" type="button" class="btn subtle">빈 캔버스</button>
+                </div>
+                <p class="hint">Mojang 공개 스킨을 API로 가져와 바로 편집할 수 있습니다.</p>
             </div>
-            <div class="control-group">
-                <label for="colorPicker">색상 선택:</label>
-                <input type="color" id="colorPicker" value="#000000">
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <p class="eyebrow">도구</p>
+                        <h2>그리기 설정</h2>
+                    </div>
+                </div>
+                <label for="colorPicker">색상 선택</label>
+                <div class="color-row">
+                    <input type="color" id="colorPicker" value="#1d4ed8">
+                    <div class="swatches">
+                        <button class="swatch" type="button" data-color="#1d4ed8" aria-label="블루"></button>
+                        <button class="swatch" type="button" data-color="#10b981" aria-label="그린"></button>
+                        <button class="swatch" type="button" data-color="#f97316" aria-label="오렌지"></button>
+                        <button class="swatch" type="button" data-color="#0f172a" aria-label="딥 블루"></button>
+                        <button class="swatch" type="button" data-color="#f8fafc" aria-label="화이트"></button>
+                    </div>
+                </div>
+
+                <p class="hint">색상을 고르고 캔버스를 드래그해 픽셀을 칠하세요.</p>
             </div>
-            <!-- 추가적인 그리기 도구 컨트롤 (예: 펜/지우개 토글, 브러시 크기 등)은 여기에 추가 -->
-            <div class="control-group">
-                <button id="downloadButton" type="button">스킨 다운로드 (.png)</button>
+
+            <div class="card callout">
+                <p class="info">
+                    <strong>다운로드 후 적용:</strong>
+                    <a href="https://www.minecraft.net/msaprofile/profile/skin" target="_blank" rel="noopener noreferrer">Minecraft 공식 사이트</a>에서 PNG를 업로드하면 바로 사용할 수 있습니다.
+                </p>
             </div>
-            <p class="info">
-                <strong>참고:</strong> 다운로드한 스킨은
-                <a href="https://www.minecraft.net/msaprofile/profile/skin" target="_blank" rel="noopener noreferrer">Minecraft 공식 웹사이트</a>에
-                로그인하여 직접 업로드해야 자신의 캐릭터에 적용됩니다.
-            </p>
         </section>
 
-        <section class="editor-area">
-            <div class="canvas-container">
-                <h2>2D 편집기 (64x64)</h2>
-                <canvas id="skinCanvas" width="64" height="64"></canvas>
-            </div>
-            <div class="preview-container">
-                <h2>3D 미리보기</h2>
-                <div id="skinPreview">
-                    <!-- skinview3d 라이브러리가 여기에 3D 뷰어를 렌더링합니다. -->
+        <section class="workspace">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">2D</p>
+                        <h2>픽셀 편집 (64×64)</h2>
+                    </div>
                 </div>
+                <div class="canvas-shell">
+                    <canvas id="skinCanvas" width="64" height="64"></canvas>
+                </div>
+                <p class="hint">좌측 도구를 골라 칠하거나 지우세요.</p>
             </div>
         </section>
     </main>
 
-    <footer>
-        <p>© Your Project Name or Your Name</p> <!-- 이 부분은 실제 프로젝트 정보로 수정하세요 -->
-    </footer>
-
-    <!-- 1. skinview3d 라이브러리 먼저 로드 (CDN 사용) -->
-    {% load static %}
-    <script src="{% static 'skin_editor/js/skinview3d.bundle.js' %}"></script>
-
-
-
     <script>
-        // JavaScript에서 사용할 수 있도록 Django 템플릿 태그로 URL 생성
-        // 이 변수들은 main.js 파일이 로드되기 전에 정의되어야 합니다.
-        var defaultSkinUrl = "{% static 'skin_editor/assets/images/default_skin.png' %}"; // 기본 스킨 이미지 경로
-        var getSkinApiUrlTemplate = "{% url 'skin_editor:get_skin_api' %}"; // API URL 템플릿
+        var defaultSkinUrl = "{% static 'skin_editor/assets/images/default_skin.png' %}";
+        var getSkinApiUrlTemplate = "{% url 'skin_editor:get_skin_api' %}";
     </script>
-
-    <!-- 2. 그 다음에 메인 JavaScript 파일 로드 -->
     <script src="{% static 'skin_editor/js/main.js' %}"></script>
 </body>
 </html>

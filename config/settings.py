@@ -95,7 +95,7 @@ USE_I18N = True
 USE_TZ = True
 
 # 정적 파일 경로 설정
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # 기본 자동 필드 타입 설정
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -156,4 +156,3 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
-

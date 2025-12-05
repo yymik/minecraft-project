@@ -11,15 +11,21 @@
   <button type="submit">💾 저장</button>
   <a href="/wiki/{{ title }}/">취소</a>
 </form>
+{{ content|json_script:"wiki-content-json" }}
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 <script>
+  const initialValue = (() => {
+    const el = document.getElementById('wiki-content-json');
+    if (!el) return '';
+    try { return JSON.parse(el.textContent); } catch (e) { return el.textContent || ''; }
+  })();
   const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
     height: '500px',
     initialEditType: 'markdown',
     previewStyle: 'vertical',
-    initialValue: `{{ content|escapejs }}`
+    initialValue: initialValue
   });
   document.querySelector('form').addEventListener('submit', function () {
     document.querySelector('#content-input').value = editor.getMarkdown();
