@@ -37,7 +37,6 @@
       <ul class="enchant-list">
         {% for enchant in recommended_enchants %}
           <li>
-            <img src="{{ enchant.icon }}" alt="{{ enchant.name }}" class="enchant-icon">
             <span>{{ enchant.name }}</span>
             <small class="ms-2 text-muted">({{ enchant.description }})</small>
           </li>
@@ -53,7 +52,6 @@
       <ul class="enchant-list">
         {% for enchant in general_enchants %}
           <li>
-            <img src="{{ enchant.icon }}" alt="{{ enchant.name }}" class="enchant-icon">
             <span>{{ enchant.name }}</span>
             <small class="ms-2 text-muted">({{ enchant.description }})</small>
           </li>
@@ -69,7 +67,6 @@
       <ul class="enchant-list">
         {% for enchant in not_recommended_enchants %}
           <li>
-            <img src="{{ enchant.icon }}" alt="{{ enchant.name }}" class="enchant-icon">
             <span>{{ enchant.name }}</span>
             <small class="ms-2 text-muted">({{ enchant.description }})</small>
           </li>

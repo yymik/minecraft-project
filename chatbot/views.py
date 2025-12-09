@@ -11,28 +11,34 @@ SAMPLE_PLAYERS = {
     "steve": {
         "nickname": "Steve",
         "uuid": "8667ba71b85a4004af54457a9734eed7",
-        "skin_url": "https://crafatar.com/renders/body/8667ba71b85a4004af54457a9734eed7?overlay",
-        "skin_avatar_url": "https://crafatar.com/avatars/8667ba71b85a4004af54457a9734eed7?overlay",
+        "skin_url": "https://visage.surgeplay.com/full/384/8667ba71b85a4004af54457a9734eed7",
+        "skin_render_url": "https://visage.surgeplay.com/full/384/8667ba71b85a4004af54457a9734eed7",
+        "skin_avatar_url": "https://visage.surgeplay.com/head/128/8667ba71b85a4004af54457a9734eed7",
         "skin_texture_url": "https://textures.minecraft.net/texture/1a1b0b9d3eb6f7b0447d6b7ad16cf4123f8eb68075cc1652edc8c2f49038e430",
         "last_seen": "2025-01-10",
+        "likes": 16420,
         "notes": "기본 남성 캐릭터 스킨",
     },
     "alex": {
         "nickname": "Alex",
         "uuid": "ec561538f3fd461daff5086b22154bce",
-        "skin_url": "https://crafatar.com/renders/body/ec561538f3fd461daff5086b22154bce?overlay",
-        "skin_avatar_url": "https://crafatar.com/avatars/ec561538f3fd461daff5086b22154bce?overlay",
+        "skin_url": "https://visage.surgeplay.com/full/384/ec561538f3fd461daff5086b22154bce",
+        "skin_render_url": "https://visage.surgeplay.com/full/384/ec561538f3fd461daff5086b22154bce",
+        "skin_avatar_url": "https://visage.surgeplay.com/head/128/ec561538f3fd461daff5086b22154bce",
         "skin_texture_url": "https://textures.minecraft.net/texture/43474a9c3234225a0af2d15fe81f763b0e083189da3b087c032832b2c9442cc6",
         "last_seen": "2025-01-11",
+        "likes": 13210,
         "notes": "기본 여성 캐릭터 스킨",
     },
     "notch": {
         "nickname": "Notch",
         "uuid": "069a79f444e94726a5befca90e38aaf5",
-        "skin_url": "https://crafatar.com/renders/body/069a79f444e94726a5befca90e38aaf5?overlay",
-        "skin_avatar_url": "https://crafatar.com/avatars/069a79f444e94726a5befca90e38aaf5?overlay",
+        "skin_url": "https://visage.surgeplay.com/full/384/069a79f444e94726a5befca90e38aaf5",
+        "skin_render_url": "https://visage.surgeplay.com/full/384/069a79f444e94726a5befca90e38aaf5",
+        "skin_avatar_url": "https://visage.surgeplay.com/head/128/069a79f444e94726a5befca90e38aaf5",
         "skin_texture_url": "https://textures.minecraft.net/texture/41ba1e8d2250b6246af2a3beea2981b61bf3eefec9e3ea364ab539766c7af8bd",
         "last_seen": "2024-12-25",
+        "likes": 9800,
         "notes": "마인크래프트 창시자",
     },
 }
@@ -83,21 +89,34 @@ def user_info_view(request):
         else:
             lookup = get_uuid_info(query)
             if lookup and not lookup.get("error") and lookup.get("uuid"):
+                uuid = lookup.get("uuid")
+                render_url = f"https://visage.surgeplay.com/full/384/{uuid}"
+                avatar_url = f"https://visage.surgeplay.com/head/128/{uuid}"
                 result = {
                     "nickname": lookup.get("nickname", query),
-                    "uuid": lookup.get("uuid"),
+                    "uuid": uuid,
                     "source": "모장 공식 API",
-                    "skin_url": None,
+                    "skin_url": render_url,  # 본문 표시용 렌더 (기본 제공)
+                    "skin_render_url": render_url,
                     "skin_texture_url": None,
-                    "skin_avatar_url": None,
+                    "skin_avatar_url": avatar_url,  # 아바타 표시용
                     "last_seen": timezone.now().date().isoformat(),
                     "notes": "외부 API에서 조회한 결과입니다.",
                 }
-                skin_profile = get_skin_profile(result["uuid"])
+                skin_profile = get_skin_profile(uuid)
                 if skin_profile.get("skin_url"):
                     result["skin_texture_url"] = skin_profile["skin_url"]
-                    result["skin_url"] = skin_profile.get("render_url") or skin_profile["skin_url"]
-                    result["skin_avatar_url"] = skin_profile.get("avatar_url")
+                    tex = skin_profile["skin_url"]
+                    result["skin_render_url"] = (
+                        f"https://render.skinmc.net/3d/skin?skin={tex}&scale=10&shadow=true"
+                    )
+                    result["skin_url"] = result["skin_render_url"]
+                    result["skin_avatar_url"] = f"https://render.skinmc.net/2d/head?skin={tex}&scale=10"
+                if skin_profile.get("render_url"):
+                    result["skin_render_url"] = skin_profile["render_url"]
+                    result["skin_url"] = skin_profile["render_url"]
+                if skin_profile.get("avatar_url"):
+                    result["skin_avatar_url"] = skin_profile["avatar_url"]
                 elif skin_profile.get("error"):
                     result["skin_error"] = skin_profile["error"]
             else:
@@ -106,6 +125,7 @@ def user_info_view(request):
                     result = deepcopy(sample)
                     result["source"] = "샘플 데이터"
                     result.setdefault("skin_texture_url", result.get("skin_url"))
+                    result.setdefault("skin_render_url", result.get("skin_url"))
                 else:
                     error = lookup.get("error") if lookup else "플레이어 정보를 찾을 수 없습니다."
 
@@ -120,6 +140,9 @@ def user_info_view(request):
         "result": result,
         "error": error,
         "recent_searches": recent_searches,
-        "sample_players": [data for data in SAMPLE_PLAYERS.values()],
+        "sample_players": [
+            {**deepcopy(data), "skin_render_url": data.get("skin_render_url") or data.get("skin_url")}
+            for data in SAMPLE_PLAYERS.values()
+        ],
     }
     return render(request, "chatbot/user_info.html", context)

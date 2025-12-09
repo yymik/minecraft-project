@@ -1,163 +1,244 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}마크 유저 조회{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <h2 class="h4 mb-3">
-            <i class="bi bi-person-search me-2"></i>마인크래프트 유저 조회
-          </h2>
-          <p class="text-muted mb-4">
-            닉네임을 입력하면 UUID를 확인할 수 있습니다. 네트워크가 제한된 환경에서는 아래 샘플 데이터가 대신 표시됩니다.
-          </p>
-          <form method="post" class="row g-3">
-            {% csrf_token %}
-            <div class="col-md-9">
-              <input type="text"
-                     name="nickname"
-                     class="form-control form-control-lg"
-                     placeholder="예: Steve"
-                     value="{{ query|default:'' }}"
-                     required>
-            </div>
-            <div class="col-md-3 d-grid">
-              <button type="submit" class="btn btn-primary btn-lg">
-                <i class="bi bi-search me-1"></i>조회하기
-              </button>
-            </div>
-          </form>
+{% static 'skin_editor/assets/images/default_skin.png' as default_skin %}
+<style>
+  .mc-card { border: 1px solid #e9ecef; }
+  .mc-avatar-lg { width: 72px; height: 72px; image-rendering: pixelated; object-fit: cover; }
+  .mc-avatar-sm { width: 32px; height: 32px; image-rendering: pixelated; object-fit: cover; }
+  .skin-preview { max-height: 220px; image-rendering: pixelated; }
+  .sample-card { transition: transform .1s ease, box-shadow .1s ease; border: 1px solid #e9ecef; }
+  .sample-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.08); }
+</style>
+
+<div class="container py-3">
+  <div class="card shadow-sm mb-4 mc-card">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+        <h2 class="h4 mb-0 d-flex align-items-center gap-2">
+          <i class="bi bi-person-search text-primary"></i>
+          마인크래프트 유저 조회
+        </h2>
+      </div>
+      <p class="text-muted small mb-3">
+        닉네임을 입력하면 UUID를 확인할 수 있습니다. 네트워크가 제한된 환경에서는 아래 샘플 데이터가 대신 표시됩니다.
+      </p>
+      <form method="post" class="row g-2 align-items-center">
+        {% csrf_token %}
+        <div class="col-md-9">
+          <div class="input-group input-group-lg">
+            <span class="input-group-text bg-white text-muted border-end-0">
+              <i class="bi bi-at"></i>
+            </span>
+            <input type="text"
+                   name="nickname"
+                   class="form-control form-control-lg border-start-0"
+                   placeholder="예: Steve"
+                   value="{{ query|default:'' }}"
+                   required>
+          </div>
         </div>
+        <div class="col-md-3 d-grid">
+          <button type="submit" class="btn btn-primary btn-lg d-flex justify-content-center align-items-center gap-2">
+            <i class="bi bi-search"></i>
+            조회하기
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endif %}
+
+  {% if result %}
+  <div class="card shadow-sm mb-4 mc-card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-2">
+        <div class="d-flex align-items-center gap-3">
+          {% with avatar_src=result.skin_avatar_url|default_if_none:result.skin_render_url|default_if_none:result.skin_url|default_if_none:default_skin %}
+          <a href="{{ avatar_src }}"
+             target="_blank" rel="noopener"
+             class="d-inline-flex align-items-center text-decoration-none">
+            <img src="{{ avatar_src }}"
+                 alt="{{ result.nickname }} 아바타"
+                 class="rounded-circle border mc-avatar-lg"
+                 data-fallback="{{ default_skin }}"
+                 onerror="if(!this.dataset.errored){this.dataset.errored=1;this.src='{{ default_skin }}';}">
+          </a>
+          {% endwith %}
+          <div>
+            <h3 class="h5 mb-1">{{ result.nickname }}</h3>
+            <span class="badge bg-secondary">{{ result.source }}</span>
+          </div>
+        </div>
+        {% if result.skin_avatar_url %}
+          <a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener"
+             class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+            <img src="{{ result.skin_avatar_url }}"
+                 alt="{{ result.nickname }} 아바타"
+                 class="rounded-circle border mc-avatar-sm"
+                 data-fallback="{{ default_skin }}"
+                 onerror="if(!this.dataset.errored){this.dataset.errored=1;this.src='{{ default_skin }}';}">
+            아바타 보기
+          </a>
+        {% endif %}
       </div>
 
-      {% if error %}
-      <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {{ error }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <div class="text-center mb-3">
+        <img src="{{ result.skin_render_url|default_if_none:result.skin_url|default_if_none:default_skin }}"
+             alt="{{ result.nickname }} 전체 스킨"
+             data-fallback="{{ default_skin }}"
+             onerror="if(!this.dataset.errored){this.dataset.errored=1;this.src='{{ default_skin }}';}"
+             class="img-fluid skin-preview">
       </div>
-      {% endif %}
 
-      {% if result %}
-      <div class="card mb-4">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-            <div class="d-flex align-items-center">
-              {% if result.skin_avatar_url %}
-                <a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener"
-                   class="d-inline-flex align-items-center text-decoration-none">
-                  <img src="{{ result.skin_avatar_url }}"
-                       alt="{{ result.nickname }} 아바타"
-                       class="rounded-circle border me-3"
-                       style="width:72px; height:72px; image-rendering:pixelated;">
-                </a>
-              {% elif result.skin_url %}
-                <img src="{{ result.skin_url }}"
-                     alt="{{ result.nickname }} 스킨"
-                     class="rounded-circle border me-3"
-                     style="width:72px; height:72px; object-fit:cover;">
-              {% endif %}
-              <div>
-                <h3 class="h5 mb-1">{{ result.nickname }}</h3>
-                <span class="badge bg-secondary">{{ result.source }}</span>
-              </div>
-            </div>
-            {% if result.skin_avatar_url %}
-              <a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener"
-                 class="btn btn-outline-secondary btn-sm d-flex align-items-center">
-                <img src="{{ result.skin_avatar_url }}"
-                     alt="{{ result.nickname }} 아바타"
-                     class="rounded-circle border me-2"
-                     style="width:32px; height:32px; image-rendering:pixelated;">
-                아바타 보기
-              </a>
-            {% endif %}
-          </div>
-          {% if result.skin_url %}
-          <div class="text-center mb-3">
-            <img src="{{ result.skin_url }}"
-                 alt="{{ result.nickname }} 전체 스킨"
-                 class="img-fluid"
-                 style="max-width:220px; image-rendering:pixelated;">
-          </div>
+      <dl class="row mb-0 small">
+        <dt class="col-sm-3">UUID</dt>
+        <dd class="col-sm-9"><code>{{ result.uuid }}</code></dd>
+        {% if result.skin_texture_url %}
+        <dt class="col-sm-3">스킨 텍스처</dt>
+        <dd class="col-sm-9">
+          <a href="{{ result.skin_texture_url }}" target="_blank" rel="noopener">텍스처 다운로드</a>
+          {% if result.skin_avatar_url %}
+            <span class="text-muted ms-2"><a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener">아바타 보기</a></span>
           {% endif %}
-          <dl class="row mb-0">
-            <dt class="col-sm-3">UUID</dt>
-            <dd class="col-sm-9"><code>{{ result.uuid }}</code></dd>
-            {% if result.skin_texture_url %}
-            <dt class="col-sm-3">스킨 텍스처</dt>
-            <dd class="col-sm-9">
-              <a href="{{ result.skin_texture_url }}" target="_blank" rel="noopener">텍스처 다운로드</a>
-              {% if result.skin_avatar_url %}
-                <span class="text-muted ms-2"><a href="{{ result.skin_avatar_url }}" target="_blank" rel="noopener">아바타 보기</a></span>
-              {% endif %}
-            </dd>
-            {% elif result.skin_error %}
-            <dt class="col-sm-3">스킨 정보</dt>
-            <dd class="col-sm-9 text-muted">{{ result.skin_error }}</dd>
-            {% endif %}
-            {% if result.last_seen %}
-            <dt class="col-sm-3">최근 확인</dt>
-            <dd class="col-sm-9">{{ result.last_seen }}</dd>
-            {% endif %}
-            {% if result.notes %}
-            <dt class="col-sm-3">메모</dt>
-            <dd class="col-sm-9">{{ result.notes }}</dd>
-            {% endif %}
-          </dl>
+        </dd>
+        {% elif result.skin_error %}
+        <dt class="col-sm-3">스킨 정보</dt>
+        <dd class="col-sm-9 text-muted">{{ result.skin_error }}</dd>
+        {% endif %}
+        {% if result.last_seen %}
+        <dt class="col-sm-3">최근 확인</dt>
+        <dd class="col-sm-9">{{ result.last_seen }}</dd>
+        {% endif %}
+        {% if result.notes %}
+        <dt class="col-sm-3">메모</dt>
+        <dd class="col-sm-9">{{ result.notes }}</dd>
+        {% endif %}
+      </dl>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if recent_searches %}
+  <div class="card mb-4 mc-card">
+    <div class="card-header">
+      <strong><i class="bi bi-clock-history me-2"></i>최근 조회</strong>
+    </div>
+    <div class="card-body">
+      {% for nickname in recent_searches %}
+        <span class="badge bg-light text-dark me-1">{{ nickname }}</span>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="card mc-card">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <strong><i class="bi bi-stars me-2"></i>샘플 플레이어</strong>
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">정렬</span>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span id="sampleSortLabel">이름 순</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" id="sampleSortMenu">
+            <li><a class="dropdown-item" href="#" data-sort="likes">좋아요 순</a></li>
+            <li><a class="dropdown-item" href="#" data-sort="latest">최신 순</a></li>
+            <li><a class="dropdown-item" href="#" data-sort="random">랜덤 순</a></li>
+            <li><a class="dropdown-item" href="#" data-sort="name">이름 순</a></li>
+          </ul>
         </div>
       </div>
-      {% endif %}
-
-      {% if recent_searches %}
-      <div class="card mb-4">
-        <div class="card-header">
-          <strong><i class="bi bi-clock-history me-2"></i>최근 조회</strong>
-        </div>
-        <div class="card-body">
-          {% for nickname in recent_searches %}
-            <span class="badge bg-light text-dark me-1">{{ nickname }}</span>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="card">
-        <div class="card-header">
-          <strong><i class="bi bi-stars me-2"></i>샘플 플레이어</strong>
-        </div>
-        <div class="card-body">
-          <div class="row g-3">
-            {% for player in sample_players %}
-            <div class="col-md-4">
-              <div class="border rounded p-3 h-100">
-                <h5>{{ player.nickname }}</h5>
-                {% if player.skin_avatar_url %}
-                  <img src="{{ player.skin_avatar_url }}"
-                       alt="{{ player.nickname }} 아바타"
-                       class="rounded-circle border mb-2"
-                       style="width:60px; height:60px; image-rendering:pixelated;">
-                {% endif %}
-                {% if player.skin_url %}
-                  <img src="{{ player.skin_url }}"
-                       alt="{{ player.nickname }} 스킨"
-                       class="img-fluid rounded mb-2"
-                       style="max-height:160px; image-rendering:pixelated;">
-                {% endif %}
-                <p class="small text-muted mb-1">UUID</p>
-                <code class="d-block mb-2 text-break">{{ player.uuid }}</code>
-                {% if player.skin_texture_url %}
-                  <a href="{{ player.skin_texture_url }}" target="_blank" rel="noopener" class="small">텍스처 보기</a>
-                {% endif %}
-                <p class="small text-muted mb-0">{{ player.notes }}</p>
-              </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3" id="sampleGrid">
+        {% for player in sample_players %}
+        <div class="col-md-4 sample-card-wrapper" data-name="{{ player.nickname|lower }}" data-likes="{{ player.likes|default:0 }}" data-latest="{{ player.last_seen|default:'' }}">
+          <div class="rounded p-3 h-100 sample-card bg-white">
+            <div class="d-flex align-items-center mb-2">
+              <img src="{{ player.skin_avatar_url|default:player.skin_render_url|default:player.skin_url|default:default_skin }}"
+                   alt="{{ player.nickname }} 아바타"
+                   class="rounded-circle border me-2 mc-avatar-sm"
+                   data-fallback="{{ default_skin }}"
+                   onerror="if(!this.dataset.errored){this.dataset.errored=1;this.src='{{ default_skin }}';}">
+              <h5 class="mb-0">{{ player.nickname }}</h5>
             </div>
-          {% endfor %}
+            <div class="text-center mb-2">
+              <img src="{{ player.skin_render_url|default:player.skin_url|default:default_skin }}"
+                   alt="{{ player.nickname }} 스킨"
+                   data-fallback="{{ default_skin }}"
+                   onerror="if(!this.dataset.errored){this.dataset.errored=1;this.src='{{ default_skin }}';}"
+                   class="img-fluid rounded skin-preview">
+            </div>
+            <p class="small text-muted mb-1 fw-semibold">UUID</p>
+            <code class="small d-block mb-2 text-break">{{ player.uuid }}</code>
+            {% if player.skin_texture_url %}
+              <a href="{{ player.skin_texture_url }}" target="_blank" rel="noopener" class="small">텍스처 보기</a>
+            {% endif %}
+            <p class="small text-muted mb-0">{{ player.notes }}</p>
           </div>
         </div>
+        {% endfor %}
       </div>
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('img[data-fallback]').forEach(img => {
+    const fallback = img.getAttribute('data-fallback');
+    img.addEventListener('error', () => {
+      if (img.dataset.errored) return;
+      img.dataset.errored = '1';
+      img.src = fallback;
+    });
+  });
+
+  const grid = document.getElementById('sampleGrid');
+  const sortMenu = document.getElementById('sampleSortMenu');
+  const sortLabel = document.getElementById('sampleSortLabel');
+
+  if (grid && sortMenu) {
+    const sorters = {
+      likes: (a, b) => (Number(b.dataset.likes) || 0) - (Number(a.dataset.likes) || 0),
+      latest: (a, b) => (Date.parse(b.dataset.latest) || 0) - (Date.parse(a.dataset.latest) || 0),
+      random: () => Math.random() - 0.5,
+      name: (a, b) => (a.dataset.name || '').localeCompare(b.dataset.name || '')
+    };
+
+    const sortCards = (key, labelText) => {
+      const cards = Array.from(grid.children);
+      if (key === 'random') {
+        cards.sort(sorters.random);
+      } else {
+        const sorter = sorters[key] || sorters.name;
+        cards.sort(sorter);
+      }
+      grid.replaceChildren(...cards);
+      if (labelText && sortLabel) {
+        sortLabel.textContent = labelText;
+      }
+    };
+
+    sortMenu.querySelectorAll('a[data-sort]').forEach(link => {
+      link.addEventListener('click', evt => {
+        evt.preventDefault();
+        sortCards(link.dataset.sort, link.textContent.trim());
+      });
+    });
+
+    // 기본 정렬: 이름 순
+    sortCards('name');
+  }
+});
+</script>
 {% endblock %}
